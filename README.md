@@ -11,4 +11,4 @@ Run `./setup-stage1.sh` to set up an FFXIV environment
 
 Run `./setup-stage2.sh` to set up Proton for ACT support
 
-See the [Guide][Guide.md] for the full guide
+See the [Guide](Guide.md) for the full guide
