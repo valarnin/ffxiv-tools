@@ -52,7 +52,10 @@ echo "Proton distribution: $PROTON_DIST_PATH"
 prompt_continue
 
 echo 'Getting a list of installed packages in wine prefix'
-WINE_INSTALLED_PACKAGES="$(wine64 uninstaller --list 2>/dev/null)"
+
+# Need to remove carriage returns from this output
+
+WINE_INSTALLED_PACKAGES="$(wine64 uninstaller --list | sed -e 's/\r//g' 2>/dev/null)"
 
 echo 'Checking for WINE Mono'
 
@@ -64,21 +67,54 @@ fi
 
 echo 'Checking for .NET Framework'
 
-# TODO: Check for each version in order and start installation where it left off?
+# Version strings for .NET Framework detection
 
-if [[ "$(echo "$WINE_INSTALLED_PACKAGES" | grep '{92FB6C44-E685-45AD-9B20-CADF4CABA132} - 1033')" == "" ]]; then
-    echo 'Could not find .NET Framework 4.7.2, running winetricks installer for each version in order'
+DOTNET_VS_40_C="Microsoft .NET Framework 4 Client Profile|||Microsoft .NET Framework 4 Client Profile"
+DOTNET_VS_40_E="Microsoft .NET Framework 4 Extended|||Microsoft .NET Framework 4 Extended"
+DOTNET_VS_45="{92FB6C44-E685-45AD-9B20-CADF4CABA132} - 1033|||Microsoft .NET Framework 4.5"
+DOTNET_VS_452="{92FB6C44-E685-45AD-9B20-CADF4CABA132} - 1033|||Microsoft .NET Framework 4.5.2"
+DOTNET_VS_46="{92FB6C44-E685-45AD-9B20-CADF4CABA132} - 1033|||Microsoft .NET Framework 4.6"
+DOTNET_VS_461="{92FB6C44-E685-45AD-9B20-CADF4CABA132} - 1033|||Microsoft .NET Framework 4.6.1"
+DOTNET_VS_462="{92FB6C44-E685-45AD-9B20-CADF4CABA132} - 1033|||Microsoft .NET Framework 4.6.2"
+DOTNET_VS_471="{92FB6C44-E685-45AD-9B20-CADF4CABA132} - 1033|||Microsoft .NET Framework 4.7.1"
+DOTNET_VS_472="{92FB6C44-E685-45AD-9B20-CADF4CABA132}.KB4087364|||Update for Microsoft .NET Framework 4.7.2 (KB4087364)"
+
+if [[ "$(echo "$WINE_INSTALLED_PACKAGES" | grep "$DOTNET_VS_472")" == "$DOTNET_VS_472" ]]; then
+    echo 'Found .NET Framework 4.7.2 in wine prefix'
+else
+    echo 'Could not find .NET Framework 4.7.2, determining where we need to start the installation process'
+    WINETRICKS_DOTNET_PACKAGES=""
+    if [[ "$(echo "$WINE_INSTALLED_PACKAGES" | grep "$DOTNET_VS_471")" == "$DOTNET_VS_471" ]]; then
+        echo 'Detected .NET Framework 4.7.1, only need to install 4.7.2'
+        WINETRICKS_DOTNET_PACKAGES="dotnet472"
+    elif [[ "$(echo "$WINE_INSTALLED_PACKAGES" | grep "$DOTNET_VS_462")" == "$DOTNET_VS_462" ]]; then
+        echo 'Detected .NET Framework 4.6.2, starting install with 4.7.1'
+        WINETRICKS_DOTNET_PACKAGES="dotnet471 dotnet472"
+    elif [[ "$(echo "$WINE_INSTALLED_PACKAGES" | grep "$DOTNET_VS_461")" == "$DOTNET_VS_461" ]]; then
+        echo 'Detected .NET Framework 4.6.1, starting install with 4.6.2'
+        WINETRICKS_DOTNET_PACKAGES="dotnet462 dotnet471 dotnet472"
+    elif [[ "$(echo "$WINE_INSTALLED_PACKAGES" | grep "$DOTNET_VS_46")" == "$DOTNET_VS_46" ]]; then
+        echo 'Detected .NET Framework 4.6, starting install with 4.6.1'
+        WINETRICKS_DOTNET_PACKAGES="dotnet461 dotnet462 dotnet471 dotnet472"
+    elif [[ "$(echo "$WINE_INSTALLED_PACKAGES" | grep "$DOTNET_VS_452")" == "$DOTNET_VS_452" ]]; then
+        echo 'Detected .NET Framework 4.5.2, starting install with 4.6'
+        WINETRICKS_DOTNET_PACKAGES="dotnet46 dotnet461 dotnet462 dotnet471 dotnet472"
+    elif [[ "$(echo "$WINE_INSTALLED_PACKAGES" | grep "$DOTNET_VS_45")" == "$DOTNET_VS_45" ]]; then
+        echo 'Detected .NET Framework 4.5, starting install with 4.5.2'
+        WINETRICKS_DOTNET_PACKAGES="dotnet452 dotnet46 dotnet461 dotnet462 dotnet471 dotnet472"
+    elif [[ "$(echo "$WINE_INSTALLED_PACKAGES" | grep "$DOTNET_VS_40_C")" == "$DOTNET_VS_40_C" && "$(echo "$WINE_INSTALLED_PACKAGES" | grep "$DOTNET_VS_40_E")" == "$DOTNET_VS_40_E" ]]; then
+        echo 'Detected .NET Framework 4.0, starting install with 4.5'
+        WINETRICKS_DOTNET_PACKAGES="dotnet45 dotnet452 dotnet46 dotnet461 dotnet462 dotnet471 dotnet472"
+    fi
+    if [[ "$WINETRICKS_DOTNET_PACKAGES" == "" ]]; then
+        echo 'No .NET Framework packages detected, starting from 4.0'
+        WINETRICKS_DOTNET_PACKAGES="dotnet40 dotnet45 dotnet452 dotnet46 dotnet461 dotnet462 dotnet471 dotnet472"
+    fi
     prompt_continue
     echo 'Please continue through the install prompts for each .NET Framework installer'
     echo 'If prompted to restart by the installer, please choose Yes. This will only restart the wine server and is required for the .NET Framework to install properly'
-    "$WINETRICKS" dotnet40
-    "$WINETRICKS" dotnet45
-    "$WINETRICKS" dotnet452
-    "$WINETRICKS" dotnet46
-    "$WINETRICKS" dotnet461
-    "$WINETRICKS" dotnet462
-    "$WINETRICKS" dotnet471
-    "$WINETRICKS" dotnet472
+    echo 'If the process hangs part way through while trying to install dotnet462, you need to kill the mscorsvw.exe process that has "-Comment NGen Worker Process" in the arguments'
+    WINEDEBUG=-all "$WINETRICKS" $WINETRICKS_DOTNET_PACKAGES
 fi
 
 echo 'Checking for ACT install'
