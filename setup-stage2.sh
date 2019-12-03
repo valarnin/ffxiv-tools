@@ -82,12 +82,33 @@ if [[ "$(echo "$WINE_INSTALLED_PACKAGES" | grep '{92FB6C44-E685-45AD-9B20-CADF4C
 fi
 
 echo 'Checking for ACT install'
+ACT_LOCATION="$WINEPREFIX/drive_c/ACT"
 
-if [[ "$(echo "$WINE_INSTALLED_PACKAGES" | grep 'Advanced Combat Tracker|||Advanced Combat Tracker (remove only)')" == "" ]]; then
-    echo 'Could not find ACT install, downloading and installing latest version'
+if [ -f "$WINEPREFIX/.ACT_Location" ]; then
+    ACT_LOCATION="$(cat "$WINEPREFIX/.ACT_Location")"
+else
+    echo "Setup hasn't been run on this wine prefix before"
+    echo "Searching for the ACT install may take some time if this prefix has been highly customized."
     prompt_continue
-    wget -O "/tmp/ACT_Installer.exe" "https://advancedcombattracker.com/includes/page-download.php?id=56" &>/dev/null
-    wine64 "/tmp/ACT_Installer.exe"
+
+    TEMP_ACT_LOCATION="$(find $WINEPREFIX -name 'Advanced Combat Tracker.exe')"
+
+    if [[ "$TEMP_ACT_LOCATION" == "" ]]; then
+        echo 'Could not find ACT install, downloading and installing latest version'
+        if [[ "$(which unzip 2>/dev/null)" == "" ]]; then
+            echo "ACT install requires the unzip tool. Please install it from your distro's package manager and try again."
+            exit 1
+        fi
+        prompt_continue
+        wget -O "/tmp/ACT.zip" "https://advancedcombattracker.com/includes/page-download.php?id=57" &>/dev/null
+        mkdir -p "$ACT_LOCATION" &> /dev/null
+        unzip -qq "/tmp/ACT.zip" -d "$ACT_LOCATION"
+    else
+        ACT_LOCATION="$(dirname "$TEMP_ACT_LOCATION")"
+    fi
+    echo "Found ACT location at $ACT_LOCATION"
+    echo "Saving this path to $WINEPREFIX/.ACT_Location for future use"
+    echo "$ACT_LOCATION" > "$WINEPREFIX/.ACT_Location"
 fi
 
 echo "Making sure wine isn't running anything"
