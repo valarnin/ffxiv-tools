@@ -68,11 +68,11 @@ echo "Creating source-able environment script at $HOME/bin/ffxiv-env-setup.sh"
 cat << EOF > $HOME/bin/ffxiv-env-setup.sh
 #!/bin/bash
 $FFXIV_ENVIRON_FINAL
-PROTON_PATH="$PROTON_PATH"
-PROTON_DIST_PATH="$PROTON_DIST_PATH"
-WINEPREFIX="$WINEPREFIX"
-IS_STEAM="$IS_STEAM"
-PATH="$PROTON_DIST_PATH/bin:\$PATH"
+export PROTON_PATH="$PROTON_PATH"
+export PROTON_DIST_PATH="$PROTON_DIST_PATH"
+export WINEPREFIX="$WINEPREFIX"
+export IS_STEAM="$IS_STEAM"
+export PATH="$PROTON_DIST_PATH/bin:\$PATH"
 EOF
 
 chmod +x $HOME/bin/ffxiv-env-setup.sh
