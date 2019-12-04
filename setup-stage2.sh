@@ -4,11 +4,11 @@ prompt_continue()
 {
     CONTINUE=""
 
-    while [[ "$CONTINUE" != "Y" && "$CONTINUE" != "N" ]]; do
+    while [[ "$CONTINUE" != "Y" && "$CONTINUE" != "N" && "$CONTINUE" != "y" && "$CONTINUE" != "n" ]]; do
         read -p "Continue? [Y/N] " CONTINUE
     done
 
-    if [[ "$CONTINUE" == "N" ]]; then
+    if [[ "$CONTINUE" == "N" || "$CONTINUE" == "n" ]]; then
         echo "Aborting process"
         exit 1
     fi

@@ -1,5 +1,19 @@
 #!/bin/bash
 
+prompt_continue()
+{
+    CONTINUE=""
+
+    while [[ "$CONTINUE" != "Y" && "$CONTINUE" != "N" && "$CONTINUE" != "y" && "$CONTINUE" != "n" ]]; do
+        read -p "Continue? [Y/N] " CONTINUE
+    done
+
+    if [[ "$CONTINUE" == "N" || "$CONTINUE" == "n" ]]; then
+        echo "Aborting process"
+        exit 1prompt_continue
+    fi
+}
+
 echo "Setting up the FFXIV Environment scripts."
 echo
 echo "This script will require you to open the FFXIV launcher from Lutris or Steam as if you were going to play the game normally"
@@ -52,16 +66,7 @@ echo "Proton Distribution Path: $PROTON_DIST_PATH"
 echo "Wine Prefix: $WINEPREFIX"
 echo
 
-CONTINUE=""
-
-while [[ "$CONTINUE" != "Y" && "$CONTINUE" != "N" ]]; do
-    read -p "Continue? [Y/N] " CONTINUE
-done
-
-if [[ "$CONTINUE" == "N" ]]; then
-    echo "Aborting process"
-    exit 1
-fi
+prompt_continue
 
 echo "Creating destination directory at $HOME/bin if it doesn't exist"
 
