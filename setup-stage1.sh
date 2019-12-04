@@ -63,6 +63,10 @@ if [[ "$CONTINUE" == "N" ]]; then
     exit 1
 fi
 
+echo "Creating destination directory at $HOME/bin if it doesn't exist"
+
+mkdir -p "$HOME/bin"
+
 echo "Creating source-able environment script at $HOME/bin/ffxiv-env-setup.sh"
 
 cat << EOF > $HOME/bin/ffxiv-env-setup.sh
