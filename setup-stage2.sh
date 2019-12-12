@@ -19,6 +19,23 @@ echo 'This script will set up your wine prefix and proton executables to run ACT
 echo 'If this process is aborted at any Continue prompt, it will resume from that point the next time it is run'
 echo 'Please make sure nothing is running in the wine prefix for FFXIV before continuing'
 echo
+echo 'Checking for prerequisites'
+
+UNZIP="$(which unzip 2>/dev/null)"
+
+if [[ "$UNZIP" == "" ]]; then
+    echo "ACT install requires the unzip tool. You can continue with the setup, but it will fail attempting to install ACT."
+    prompt_continue
+fi
+
+PATCHELF="$(which patchelf 2>/dev/null)"
+
+if [[ "$PATCHELF" == "" ]]; then
+    echo "ACT install requires the patchelf tool. You can continue with the setup, but it will fail attempting to patch the wine binaries."
+    prompt_continue
+fi
+
+echo
 echo "Making sure wine isn't running anything"
 
 wine64 wineboot -s &>/dev/null
@@ -131,7 +148,7 @@ else
 
     if [[ "$TEMP_ACT_LOCATION" == "" ]]; then
         echo 'Could not find ACT install, downloading and installing latest version'
-        if [[ "$(which unzip 2>/dev/null)" == "" ]]; then
+        if [[ "$UNZIP" == "" ]]; then
             echo "ACT install requires the unzip tool. Please install it from your distro's package manager and try again."
             exit 1
         fi
@@ -149,10 +166,6 @@ fi
 
 echo "Making sure wine isn't running anything"
 wine64 wineboot -s &>/dev/null
-
-echo 'Checking for patchelf'
-
-PATCHELF="$(which patchelf 2>/dev/null)"
 
 if [[ "$PATCHELF" == "" ]]; then
     echo "patchelf binary was not found. Please install from your distro's package manager if available"
