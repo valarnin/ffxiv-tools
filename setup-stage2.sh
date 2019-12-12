@@ -163,12 +163,19 @@ fi
 echo 'Checking to see if wine binaries and libraries need to be patched'
 
 if [[ "$(patchelf --print-rpath "$(which wine)" | grep '$ORIGIN')" != "" ]]; then
-    echo 'Patching the rpath of wine executables and libraries'
-    prompt_continue
     RPATH="${PROTON_DIST_PATH}/lib64:${PROTON_DIST_PATH}/lib"
     if [[ "$IS_STEAM" == "1" ]]; then
+        # Steam requires ubuntu runtimes
         RPATH="$RPATH:$HOME/.local/share/Steam/ubuntu12_64:$HOME/.local/share/Steam/ubuntu12_32"
+    else
+        # Lutris requires extra runtimes from its install path
+        RPATH="$RPATH:$(echo $LD_LIBRARY_PATH | grep 'export LD_LIBRARY_PATH' | cut -d'=' -f2- | tr ':' $'\n' | grep '/lutris/runtime/' | tr $'\n' ':')"
     fi
+    echo 'Patching the rpath of wine executables and libraries'
+    echo 'New rpath for binaries:'
+    echo
+    echo "$RPATH"
+    prompt_continue
     patchelf --set-rpath "$RPATH" "$(which wine)"
     patchelf --set-rpath "$RPATH" "$(which wine64)"
     patchelf --set-rpath "$RPATH" "$(which wineserver)"
