@@ -10,7 +10,7 @@ prompt_continue()
 
     if [[ "$CONTINUE" == "N" || "$CONTINUE" == "n" ]]; then
         echo "Aborting process"
-        exit 1prompt_continue
+        exit 1
     fi
 }
 
@@ -58,9 +58,27 @@ PROTON_DIST_PATH="$(dirname "$(dirname "$PROTON_PATH")")"
 
 WINEPREFIX="$(echo "$FFXIV_ENVIRON_FINAL" | grep 'export WINEPREFIX=' | cut -d'=' -f2)"
 
+# Check for wine already being setcap'd, fail if so
+if [[ "$(getcap "$PROTON_PATH")" == "" ]]; then
+    echo "Detected that you're running this against an already configured Proton (the binary at path \"$PROTON_PATH\" has capabilities set already)"
+    echo "You must run this script against a fresh proton install, or else the LD_LIBRARY_PATH environment variable configured by your runtime cannot be detected"
+    exit 1
+fi
+
+if [[ "$(echo "$FFXIV_ENVIRON_FINAL" | grep 'export LD_LIBRARY_PATH=')" == "" ]]; then
+    echo "Unable to determine runtime LD_LIBRARY_PATH."
+    echo "This may indicate something strange with your setup."
+    echo "Please submit a new issue to the github repo or contact me via Discord."
+    exit 1
+fi
+
 echo
 echo "Detected the following information about your setup. If any of this looks incorrect, please abort and report a bug to the Github repo..."
-echo "Runtime Environment: $([ $IS_STEAM ] && echo "Steam" || echo "Proton")"
+if [[ "$IS_STEAM" == "1" ]]; then
+    echo "Runtime Environment: Steam"
+else
+    echo "Runtime Environment: Lutris"
+fi
 echo "wine Executable Location: $PROTON_PATH"
 echo "Proton Distribution Path: $PROTON_DIST_PATH"
 echo "Wine Prefix: $WINEPREFIX"
