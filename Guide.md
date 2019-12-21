@@ -31,13 +31,14 @@ Additionally, please note that as of patch 5.08 released on 2019-08-29, you must
 
 A final note that if your windowing manager does not render windows on other workspaces actively (i3 is our test case here) you will have issues with ACT working properly. See the Troubleshooting section for more information.
 
-Tested as working on the following setups:
+Tested as working on the following setups, though any Linux capable of getting FFXIV itself working should work properly:
 
 1. `gentoo amd64/17.0, kernel 5.2.2, Gnome 3`
 2. `gentoo amd64/17.1, kernel 5.2.2, Gnome 3`
-3. `arch linux, more info needed`
+3. `Arch Linux, 5.4.5-arch1-1, Mutter`
 4. `Linux Mint 19.2 Cinnamon, kernel 4.15.0-62-generic, Cinnamon`
 5. `Manjaro Linux, kernel 5.2.14-arch1-1-fsync, Gnome 3`
+6. `Manjaro Linux, kernel 4.19.89-1-MANJARO, Gnome 3`
 
 # Support
 
