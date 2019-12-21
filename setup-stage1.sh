@@ -59,7 +59,7 @@ PROTON_DIST_PATH="$(dirname "$(dirname "$PROTON_PATH")")"
 WINEPREFIX="$(echo "$FFXIV_ENVIRON_FINAL" | grep 'export WINEPREFIX=' | cut -d'=' -f2)"
 
 # Check for wine already being setcap'd, fail if so
-if [[ "$(getcap "$PROTON_PATH")" == "" ]]; then
+if [[ "$(getcap "$PROTON_PATH")" != "" ]]; then
     echo "Detected that you're running this against an already configured Proton (the binary at path \"$PROTON_PATH\" has capabilities set already)"
     echo "You must run this script against a fresh proton install, or else the LD_LIBRARY_PATH environment variable configured by your runtime cannot be detected"
     exit 1
