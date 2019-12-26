@@ -14,6 +14,33 @@ prompt_continue()
     fi
 }
 
+prompt_backup()
+{
+    CONTINUE=""
+
+    while [[ "$CONTINUE" != "Y" && "$CONTINUE" != "N" && "$CONTINUE" != "y" && "$CONTINUE" != "n" ]]; do
+        read -p "Would you like to make a backup of your Proton install and FFXIV prefix? [Y/N] " CONTINUE
+    done
+
+    if [[ "$CONTINUE" == "N" || "$CONTINUE" == "n" ]]; then
+        echo "Skipping backup"
+    else
+        TIMESTAMP="$(date +%s)"
+
+        PROTON_BACKUP_FILENAME="BACKUP_dist_$TIMESTAMP.tar.gz"
+        PROTON_BACKUP_DIR="$(dirname "$PROTON_DIST_PATH")"
+        echo "Creating Proton backup at $PROTON_BACKUP_DIR/$PROTON_BACKUP_FILENAME"
+        tar -C "$PROTON_BACKUP_DIR" -czf "$PROTON_BACKUP_DIR/$PROTON_BACKUP_FILENAME" "$(basename "$PROTON_DIST_PATH")"
+        echo "Backup created, size $(du -h "$PROTON_BACKUP_DIR/$PROTON_BACKUP_FILENAME" | cut -f1)"
+
+        PREFIX_BACKUP_FILENAME="BACKUP_$(basename "$WINEPREFIX")_$TIMESTAMP.tar.gz"
+        PREFIX_BACKUP_DIR="$(dirname "$WINEPREFIX")"
+        echo "Creating Wine Prefix backup at $PREFIX_BACKUP_DIR/$PREFIX_BACKUP_FILENAME"
+        tar -C "$PREFIX_BACKUP_DIR" -czf "$PREFIX_BACKUP_DIR/$PREFIX_BACKUP_FILENAME" --exclude="SquareEnix/FINAL FANTASY XIV - A Realm Reborn" "$(basename "$WINEPREFIX")"
+        echo "Backup created, size $(du -h "$PREFIX_BACKUP_DIR/$PREFIX_BACKUP_FILENAME" | cut -f1)"
+    fi
+}
+
 echo 'Setting up the Proton environment to run ACT with network capture'
 echo 'This script will set up your wine prefix and proton executables to run ACT, as well as set up a default ACT install for you'
 echo 'If this process is aborted at any Continue prompt, it will resume from that point the next time it is run'
@@ -66,6 +93,12 @@ echo 'Please make backups of both!'
 echo "wine prefix: $WINEPREFIX"
 echo "Proton distribution: $PROTON_DIST_PATH"
 
+prompt_backup
+
+echo
+echo "Would you like to continue installation?"
+echo
+
 prompt_continue
 
 echo 'Getting a list of installed packages in wine prefix'
@@ -76,25 +109,27 @@ WINE_INSTALLED_PACKAGES="$(wine64 uninstaller --list | sed -e 's/\r//g' 2>/dev/n
 
 echo 'Checking for WINE Mono'
 
-if [[ "$(echo "$WINE_INSTALLED_PACKAGES" | grep '{EA50D369-6B67-43BC-8153-C3553B40ABEB} - 1033')" != "" ]]; then
+WINE_MONO_GUID="$(echo "$WINE_INSTALLED_PACKAGES" | grep -i 'Wine Mono' | cut -d'|' -f1)"
+
+if [[ "$WINE_MONO_GUID" != "" ]]; then
     echo 'WINE Mono was found in the wine prefix and must be uninstalled'
     prompt_continue
-    wine64 uninstaller --remove '{EA50D369-6B67-43BC-8153-C3553B40ABEB}'
+    wine64 uninstaller --remove "$WINE_MONO_GUID"
 fi
 
 echo 'Checking for .NET Framework'
 
 # Version strings for .NET Framework detection
 
-DOTNET_VS_40_C="Microsoft .NET Framework 4 Client Profile|||Microsoft .NET Framework 4 Client Profile"
-DOTNET_VS_40_E="Microsoft .NET Framework 4 Extended|||Microsoft .NET Framework 4 Extended"
-DOTNET_VS_45="{92FB6C44-E685-45AD-9B20-CADF4CABA132} - 1033|||Microsoft .NET Framework 4.5"
-DOTNET_VS_452="{92FB6C44-E685-45AD-9B20-CADF4CABA132} - 1033|||Microsoft .NET Framework 4.5.2"
-DOTNET_VS_46="{92FB6C44-E685-45AD-9B20-CADF4CABA132} - 1033|||Microsoft .NET Framework 4.6"
-DOTNET_VS_461="{92FB6C44-E685-45AD-9B20-CADF4CABA132} - 1033|||Microsoft .NET Framework 4.6.1"
-DOTNET_VS_462="{92FB6C44-E685-45AD-9B20-CADF4CABA132} - 1033|||Microsoft .NET Framework 4.6.2"
-DOTNET_VS_471="{92FB6C44-E685-45AD-9B20-CADF4CABA132} - 1033|||Microsoft .NET Framework 4.7.1"
-DOTNET_VS_472="{92FB6C44-E685-45AD-9B20-CADF4CABA132}.KB4087364|||Update for Microsoft .NET Framework 4.7.2 (KB4087364)"
+DOTNET_VS_40_C='Microsoft .NET Framework 4 Client Profile|||Microsoft .NET Framework 4 Client Profile'
+DOTNET_VS_40_E='Microsoft .NET Framework 4 Extended|||Microsoft .NET Framework 4 Extended'
+DOTNET_VS_45='{92FB6C44-E685-45AD-9B20-CADF4CABA132} - 1033|||Microsoft .NET Framework 4.5'
+DOTNET_VS_452='{92FB6C44-E685-45AD-9B20-CADF4CABA132} - 1033|||Microsoft .NET Framework 4.5.2'
+DOTNET_VS_46='{92FB6C44-E685-45AD-9B20-CADF4CABA132} - 1033|||Microsoft .NET Framework 4.6'
+DOTNET_VS_461='{92FB6C44-E685-45AD-9B20-CADF4CABA132} - 1033|||Microsoft .NET Framework 4.6.1'
+DOTNET_VS_462='{92FB6C44-E685-45AD-9B20-CADF4CABA132} - 1033|||Microsoft .NET Framework 4.6.2'
+DOTNET_VS_471='{92FB6C44-E685-45AD-9B20-CADF4CABA132} - 1033|||Microsoft .NET Framework 4.7.1'
+DOTNET_VS_472='{92FB6C44-E685-45AD-9B20-CADF4CABA132}.KB4087364|||Update for Microsoft .NET Framework 4.7.2 (KB4087364)'
 
 if [[ "$(echo "$WINE_INSTALLED_PACKAGES" | grep "$DOTNET_VS_472")" == "$DOTNET_VS_472" ]]; then
     echo 'Found .NET Framework 4.7.2 in wine prefix'
