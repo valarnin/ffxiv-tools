@@ -45,7 +45,7 @@ fi
 
 FFXIV_ENVIRON_FINAL="$(echo "$FFXIV_ENVIRON" | grep -P "$REQ_ENV_VARS_REGEX")"
 
-if [ $IS_STEAM ]; then
+if [[ "$IS_STEAM" == "1" ]]; then
     # Add WINE= env var for Steam setup
     FFXIV_ENVIRON_FINAL="$FFXIV_ENVIRON_FINAL"$'\n'"export WINE=$(echo "$FFXIV_ENVIRON_FINAL" | grep 'export PATH' | cut -d'=' -f2 | tr ':' $'\n' | grep -i '/dist/')wine"
 
