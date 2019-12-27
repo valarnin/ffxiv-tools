@@ -217,7 +217,7 @@ if [[ "$(patchelf --print-rpath "$(which wine)" | grep '$ORIGIN')" != "" ]]; the
         RPATH="$RPATH:$HOME/.local/share/Steam/ubuntu12_64:$HOME/.local/share/Steam/ubuntu12_32"
     else
         # Lutris requires extra runtimes from its install path
-        RPATH="$RPATH:$(echo $LD_LIBRARY_PATH | grep 'export LD_LIBRARY_PATH' | cut -d'=' -f2- | tr ':' $'\n' | grep '/lutris/runtime/' | tr $'\n' ':')"
+        RPATH="$RPATH:$(echo $LD_LIBRARY_PATH | tr ':' $'\n' | grep '/lutris/runtime/' | tr $'\n' ':')"
     fi
     echo 'Patching the rpath of wine executables and libraries'
     echo 'New rpath for binaries:'
