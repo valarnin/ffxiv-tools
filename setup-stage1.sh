@@ -53,6 +53,10 @@ if [[ "$IS_STEAM" == "1" ]]; then
     FFXIV_ENVIRON_FINAL="$(echo "$FFXIV_ENVIRON_FINAL" | grep -v 'export PATH=')"
 fi
 
+# Add FFXIV game path to environment for use in stage3 scripts
+FFXIV_PATH=$(readlink -f /proc/$FFXIV_PID/cwd)
+FFXIV_ENVIRON_FINAL="$FFXIV_ENVIRON_FINAL"$'\n'"export FFXIV_PATH=\"$FFXIV_PATH\""
+
 PROTON_PATH="$(echo "$FFXIV_ENVIRON_FINAL" | grep 'export WINE=' | cut -d'=' -f2)"
 PROTON_DIST_PATH="$(dirname "$(dirname "$PROTON_PATH")")"
 
