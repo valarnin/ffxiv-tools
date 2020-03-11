@@ -16,10 +16,15 @@ prompt_continue()
 
 prompt_backup()
 {
+    PROTON_BACKUP_DIR="$(dirname "$PROTON_DIST_PATH")"
+    PREFIX_BACKUP_DIR="$(dirname "$WINEPREFIX")"
     CONTINUE=""
 
     while [[ "$CONTINUE" != "Y" && "$CONTINUE" != "N" && "$CONTINUE" != "y" && "$CONTINUE" != "n" ]]; do
-        read -p "Would you like to make a backup of your Proton install and FFXIV prefix? [Y/N] " CONTINUE
+        for i in $PROTON_BACKUP_DIR/BACKUP_dist_*.tar.gz; do 
+		[ -e "$i" ] && echo "Backup already exists" && CONTINUE="n" || read -p "Would you like to make a backup of your Proton install and FFXIV prefix? [Y/N] " CONTINUE
+		break
+	done
     done
 
     if [[ "$CONTINUE" == "N" || "$CONTINUE" == "n" ]]; then
@@ -28,13 +33,11 @@ prompt_backup()
         TIMESTAMP="$(date +%s)"
 
         PROTON_BACKUP_FILENAME="BACKUP_dist_$TIMESTAMP.tar.gz"
-        PROTON_BACKUP_DIR="$(dirname "$PROTON_DIST_PATH")"
         echo "Creating Proton backup at $PROTON_BACKUP_DIR/$PROTON_BACKUP_FILENAME"
         tar -C "$PROTON_BACKUP_DIR" -czf "$PROTON_BACKUP_DIR/$PROTON_BACKUP_FILENAME" "$(basename "$PROTON_DIST_PATH")"
         echo "Backup created, size $(du -h "$PROTON_BACKUP_DIR/$PROTON_BACKUP_FILENAME" | cut -f1)"
 
         PREFIX_BACKUP_FILENAME="BACKUP_$(basename "$WINEPREFIX")_$TIMESTAMP.tar.gz"
-        PREFIX_BACKUP_DIR="$(dirname "$WINEPREFIX")"
         echo "Creating Wine Prefix backup at $PREFIX_BACKUP_DIR/$PREFIX_BACKUP_FILENAME"
         tar -C "$PREFIX_BACKUP_DIR" -czf "$PREFIX_BACKUP_DIR/$PREFIX_BACKUP_FILENAME" --exclude="SquareEnix/FINAL FANTASY XIV - A Realm Reborn" "$(basename "$WINEPREFIX")"
         echo "Backup created, size $(du -h "$PREFIX_BACKUP_DIR/$PREFIX_BACKUP_FILENAME" | cut -f1)"
