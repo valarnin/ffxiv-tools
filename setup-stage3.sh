@@ -1,18 +1,7 @@
 #!/bin/bash
 
-prompt_continue()
-{
-    CONTINUE=""
-
-    while [[ "$CONTINUE" != "Y" && "$CONTINUE" != "N" && "$CONTINUE" != "y" && "$CONTINUE" != "n" ]]; do
-        read -p "Continue? [Y/N] " CONTINUE
-    done
-
-    if [[ "$CONTINUE" == "N" || "$CONTINUE" == "n" ]]; then
-        echo "Aborting process"
-        exit 1
-    fi
-}
+. helpers/error.sh
+. helpers/prompt.sh
 
 SCRIPT_VERSION="2"
 
@@ -41,7 +30,7 @@ echo
 HAS_PATH="$(grep -P 'FFXIV_PATH="' $HOME/bin/ffxiv-env-setup.sh | wc -l)"
 
 if [[ "$HAS_PATH" != "1" ]]; then
-    echo "Your $HOME/bin/ffxiv-env-setup.sh script does not have a FFXIV_PATH variable."
+    error "Your $HOME/bin/ffxiv-env-setup.sh script does not have a FFXIV_PATH variable."
     echo "This likely indicates that you're running setup-stage3.sh against an environment built before it was created."
     echo "Please edit the script at $HOME/bin/ffxiv-env-setup.sh and add a line like the following, with the path corrected for your FFXIV install location:"
     echo "export FFXIV_PATH=\"/home/valarnin/.local/share/Steam/steamapps/common/FINAL FANTASY XIV Online\""
@@ -104,6 +93,8 @@ if [[ "$?" == "0" ]]; then
     echo "Writing the file"
     echo "$SCRIPT_START_GAME" > "$SCRIPT_FILE_GAME"
     chmod +x "$SCRIPT_FILE_GAME"
+else
+    echo "Skipping the file"
 fi
 echo
 
@@ -114,6 +105,8 @@ if [[ "$?" == "0" ]]; then
     echo "Writing the file"
     echo "$SCRIPT_START_ACT" > "$SCRIPT_FILE_ACT"
     chmod +x "$SCRIPT_FILE_ACT"
+else
+    echo "Skipping the file"
 fi
 echo
 
@@ -124,4 +117,6 @@ if [[ "$?" == "0" ]]; then
     echo "Writing the file"
     echo "$SCRIPT_START_BOTH" > "$SCRIPT_FILE_BOTH"
     chmod +x "$SCRIPT_FILE_BOTH"
+else
+    echo "Skipping the file"
 fi

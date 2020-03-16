@@ -1,6 +1,8 @@
 #!/bin/bash
 
-. setup-vpn-helpers.sh
+. helpers/error.sh
+. helpers/prompt.sh
+. helpers/vpn.sh
 . setup-vpn-providers.sh
 
 SCRIPT_DIR="$(dirname "$0")"

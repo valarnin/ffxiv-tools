@@ -1,6 +1,8 @@
 #!/bin/bash
 
-. setup-vpn-helpers.sh
+. helpers/error.sh
+. helpers/prompt.sh
+. helpers/vpn.sh
 
 SCRIPT_HELPER_DEST="$HOME/bin/ffxiv-vpn-helper.sh"
 SCRIPT_HELPER_CONFIG_DEST="$HOME/bin/ffxiv-vpn-helper-config.sh"

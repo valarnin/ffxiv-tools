@@ -7,7 +7,9 @@ if [ ! -e "$OVPN_CONFIG_FILE" ]; then
     exit 1
 fi
 
-. setup-vpn-helpers.sh
+. helpers/error.sh
+. helpers/prompt.sh
+. helpers/vpn.sh
 
 YES_NO=( Yes No )
 YES_NO_ANSWER=""

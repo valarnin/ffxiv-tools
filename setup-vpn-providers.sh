@@ -1,5 +1,7 @@
 #!/bin/bash
 
+. helpers/prompt.sh
+
 # Supported VPN connections
 VPN_NAMES=(
     "Private Internet Access"

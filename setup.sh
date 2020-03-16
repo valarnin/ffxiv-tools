@@ -4,6 +4,14 @@ SCRIPTDIR="$(dirname $0)"
 
 cd "$SCRIPTDIR"
 
+# Call check-deps.sh to make sure we have the required dependencies
+./check-deps.sh
+
+if [[ "$?" == "1" ]]; then
+    echo "Dependency check failed. Aborting setup."
+    exit 1
+fi
+
 # Call setup-stage1.sh to set up the environment
 ./setup-stage1.sh
 

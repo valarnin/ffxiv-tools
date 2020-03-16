@@ -1,44 +1,5 @@
 #!/bin/bash
 
-ERRORS=0
-WARNINGS=0
-SUCCESSES=0
-
-error() {
-    ((++ERRORS))
-    echo -e "\e[31m$1\e[0m"
-}
-
-warn() {
-    ((++WARNINGS))
-    echo -e "\e[33m$1\e[0m"
-}
-
-success() {
-    ((++SUCCESSES))
-    echo -e "\e[32m$1\e[0m"
-}
-
-PROMPT_IN_ARRAY() {
-    eval "ARRAY"='( "${'$1'[@]}" )'
-    ARRAY_COUNT="${#ARRAY[*]}"
-    SELECTION=""
-    while [[ "$SELECTION" == "" ]]; do
-        if [[ "$4" != "" ]]; then
-            echo "$4"
-        fi
-        for ((i=0;i<ARRAY_COUNT;++i)); do
-            echo "$i) ${ARRAY[i]}"
-        done
-        read -p "$3" SELECTION
-        if [[ ! "$SELECTION" =~ ^[0-9]+$ ]] || [ "$SELECTION" -lt 0 ] || [ "$SELECTION" -ge "$ARRAY_COUNT" ]; then
-            echo "Invalid input"
-            SELECTION=""
-        fi
-    done
-    eval "$2"="$SELECTION"
-}
-
 # Helpers for finding unused subnet for netns
 
 GET_IP_RANGE() {
