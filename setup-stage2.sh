@@ -100,7 +100,7 @@ else
     echo 'If prompted to restart by the installer, please choose Yes. This will only restart the wine server and is required for the .NET Framework to install properly'
     echo 'If the process hangs part way through while trying to install dotnet462, you need to kill the mscorsvw.exe process that has "-Comment NGen Worker Process" in the arguments'
     PROMPT_CONTINUE
-    WINEDEBUG=-all "$WINETRICKS" $WINETRICKS_DOTNET_PACKAGES
+    WINEDEBUG=-all winetricks $WINETRICKS_DOTNET_PACKAGES
 fi
 
 echo 'Checking for ACT install'
