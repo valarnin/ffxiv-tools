@@ -51,6 +51,13 @@ PROTON_DIST_PATH="$(dirname "$(dirname "$PROTON_PATH")")"
 
 WINEPREFIX="$(echo "$FFXIV_ENVIRON_FINAL" | grep 'export WINEPREFIX=' | cut -d'=' -f2)"
 
+if [[ "$(echo "$PROTON_PATH" | grep '\\ ')" != "" ]] || [[ "$(echo "$WINEPREFIX" | grep '\\ ')" != "" ]]; then
+    error "There is a space in your Proton or Wine Prefix path."
+    error "There's a known issue with spaces causing issues with the setup."
+    error "Please remove spaces from the path(s) and try again."
+    exit 1
+fi
+
 # Check for wine already being setcap'd, fail if so
 if [[ "$(getcap "$PROTON_PATH")" != "" ]]; then
     error "Detected that you're running this against an already configured Proton (the binary at path \"$PROTON_PATH\" has capabilities set already)"
