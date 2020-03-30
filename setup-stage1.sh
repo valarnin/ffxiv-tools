@@ -55,6 +55,7 @@ if [[ "$(echo "$PROTON_PATH" | grep '\\ ')" != "" ]] || [[ "$(echo "$WINEPREFIX"
     error "There is a space in your Proton or Wine Prefix path."
     error "There's a known issue with spaces causing issues with the setup."
     error "Please remove spaces from the path(s) and try again."
+    error "Prefix path detected: $PROTON_PATH"
     exit 1
 fi
 
