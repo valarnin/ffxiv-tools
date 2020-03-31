@@ -21,6 +21,9 @@ MISSING_SOFT_64=(  )
 MISSING_HARD_TOOLS=(  )
 MISSING_SOFT_TOOLS=(  )
 
+MISSING_HARD_MISC=(  )
+MISSING_SOFT_MISC=(  )
+
 echo "Checking for dependencies..."
 
 echo "Checking required 32-bit dependencies..."
@@ -94,6 +97,15 @@ for DEP in "${SOFT_TOOLS[@]}"; do
         MISSING_SOFT_TOOLS+=("$DEP")
     fi
 done
+
+echo "Checking miscellaneous requirements..."
+
+ULIMIT="$(ulimit -Hn)"
+if [[ "$ULIMIT" -lt 524288 ]]; then
+    warn "Detected a low ulimit value ($ULIMIT)."
+    warn "This will cause slow .NET Framework installation and may impact game performance."
+    MISSING_SOFT_MISC+=("ulimit")
+fi
 
 echo
 echo
