@@ -97,6 +97,9 @@ Finally, we're ready. Run FFXIV, log in to your character.
 
 If you use i3 or some other windowing manager that does not render windows that are not on the active workspace, ACT will be very unstable. For i3, reports are that putting ACT in `scratch` and the overlay on the correct workspace should work as expected, but your mileage may vary.
 
+If your overlay is not visible when the game has focus, your windowing manager may need to be manually instructed to keep the overlay above the game window (or vice versa).
+For KDE Plasma, this can be done by right-clicking the activity on the menubar, hover on “More Actions”, and enable “Keep Below Others”. This also makes it possible to see the overlay in-game when running it in borderless windowed.
+
 # Extras
 
 ## Text To Speach
