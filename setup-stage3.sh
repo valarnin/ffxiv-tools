@@ -120,3 +120,5 @@ if [[ "$?" == "0" ]]; then
 else
     echo "Skipping the file"
 fi
+
+PROMPT_DESKTOP_ENTRIES
