@@ -71,3 +71,63 @@ PROMPT_BACKUP()
         echo "Backup created, size $(du -h "$PREFIX_BACKUP_DIR/$PREFIX_BACKUP_FILENAME" | cut -f1)"
     fi
 }
+
+PROMPT_DESKTOP_ENTRIES()
+{
+    CONTINUE=""
+    
+    if [[ "$(find "$HOME/.local/share/applications" -maxdepth 1 -iname 'ffxiv-run-act.desktop' -print -quit | wc -l)" -gt 0 ]]; then
+        echo "Desktop entries have already been created"
+        CONTINUE="n"
+    fi
+
+    while [[ "$CONTINUE" != "Y" && "$CONTINUE" != "N" && "$CONTINUE" != "y" && "$CONTINUE" != "n" ]]; do
+        read -p "Would you like to create desktop entries for FFXIV and ACT? [Y/N] " CONTINUE
+    done
+
+    if [[ "$CONTINUE" == "N" || "$CONTINUE" == "n" ]]; then
+        echo "Skipping entry creation"
+    else
+        mkdir -p $HOME/.local/share/applications &> /dev/null
+        if [[ "$(find "$HOME/.local/share/icons/hicolor/128x128/apps" -maxdepth 1 -iname 'lutris_final-fantasy-xiv-a-realm-reborn.png' -print -quit | wc -l)" -gt 0 ]]; then
+            FFXIV_ICON="Icon=$HOME/.local/share/icons/hicolor/128x128/apps/lutris_final-fantasy-xiv-a-realm-reborn.png"
+        elif [[ "$(find "$HOME/.local/share/icons/hicolor/32x32/apps" -maxdepth 1 -iname 'steam_icon_39210.png' -print -quit | wc -l)" -gt 0 ]]; then
+            FFXIV_ICON="Icon=$HOME/.local/share/icons/hicolor/32x32/apps/steam_icon_39210.png"
+        else
+            echo "Could not find FFXIV's icon. To manually correct this, add \"Icon=/path/to/desired/icon\" to \"$HOME/.local/share/applications/ffxiv-run-game.desktop\""
+	    FFXIV_ICON=""
+	fi
+	mkdir -p "$HOME/.local/share/icons/hicolor/200x200/apps" &> /dev/null
+	mkdir -p "$HOME/.local/share/icons/hicolor/256x256/apps" &> /dev/null
+        wget -O "$HOME/.local/share/icons/hicolor/200x200/apps/act.png" "https://forums.advancedcombattracker.com/uploads/userpics/821/pRS0T7AHQ1UUH.png" &> /dev/null
+        wget -O "$HOME/.local/share/icons/hicolor/256x256/apps/act_ffxiv.png" "https://advancedcombattracker.com/act_data/act_ffxiv.png" &> /dev/null
+        cat <<-EOF > $HOME/.local/share/applications/ffxiv-run-both.desktop
+        [Desktop Entry]
+        Name=FFXIV & ACT
+        Exec=$HOME/bin/ffxiv-run-both.sh
+        Icon=$HOME/.local/share/icons/hicolor/256x256/apps/act_ffxiv.png
+        Type=Application
+        Terminal=False
+        Categories=Games;
+	EOF
+        cat <<-EOF > $HOME/.local/share/applications/ffxiv-run-game.desktop
+        [Desktop Entry]
+        Name=Final Fantasy XIV
+        Exec=$HOME/bin/ffxiv-run-game.sh
+        $FFXIV_ICON
+        Type=Application
+        Terminal=False
+        Categories=Games;
+	EOF
+        cat <<-EOF > $HOME/.local/share/applications/ffxiv-run-act.desktop
+        [Desktop Entry]
+        Name=Advanced Combat Tracker
+        Exec=$HOME/bin/ffxiv-run-act.sh
+        Icon=$HOME/.local/share/icons/hicolor/200x200/apps/act.png
+        Type=Application
+        Terminal=False
+        Categories=Games;
+	EOF
+	echo "Desktop entries have been created at $HOME/.local/share/applications/"
+    fi
+}
