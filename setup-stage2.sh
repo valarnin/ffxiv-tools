@@ -19,7 +19,14 @@ echo 'Sourcing the FFXIV environment'
 echo
 echo "Making sure wine isn't running anything"
 
-wine64 wineboot -s &>/dev/null
+FFXIV_PID="$(ps axo pid,cmd | grep -Pi 'ffxivlauncher(|64).exe' | grep -vi grep | sed -e 's/^[[:space:]]*//' | cut -d' ' -f1)"
+
+if [[ "$FFXIV_PID" != "" ]]; then
+    warn "FFXIV launcher detected as running, forceably closing it"
+    kill -9 "$FFXIV_PID"
+fi
+
+wine64 wineboot -fs &>/dev/null
 
 PROTON_VERSION_FULL="$(cat "$PROTON_DIST_PATH/version" | cut -d' ' -f2 | cut -d'-' -f1)"
 PROTON_VERSION_MAJOR="$(echo "$PROTON_VERSION_FULL" | cut -d'.' -f1)"
