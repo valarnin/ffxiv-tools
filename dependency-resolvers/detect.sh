@@ -5,4 +5,4 @@ if [[ -e "/etc/gentoo-release" ]]; then
     return
 fi
 
-. "$(dirname "$0")/default.sh"
+. "$(dirname "${BASH_SOURCE[0]}")/default.sh"

@@ -138,7 +138,8 @@ if [[ "$(patchelf --print-rpath "$(which wine)" | grep '$ORIGIN')" != "" ]]; the
     RPATH="${PROTON_DIST_PATH}/lib64:${PROTON_DIST_PATH}/lib"
     if [[ "$IS_STEAM" == "1" ]]; then
         # Steam requires ubuntu runtimes
-        RPATH="$RPATH:$HOME/.local/share/Steam/ubuntu12_64:$HOME/.local/share/Steam/ubuntu12_32:$HOME/.local/share/Steam/ubuntu12_32/steam-runtime/lib/i386-linux-gnu:$HOME/.local/share/Steam/ubuntu12_32/steam-runtime/lib/x86_64-linux-gnu"
+        STEAM_ROOT_PATH="$(readlink -f $HOME/.steam/root)"
+        RPATH="$RPATH:$STEAM_ROOT_PATH/ubuntu12_64:$STEAM_ROOT_PATH/ubuntu12_32:$STEAM_ROOT_PATH/ubuntu12_32/steam-runtime/lib/i386-linux-gnu:$STEAM_ROOT_PATH/ubuntu12_32/steam-runtime/lib/x86_64-linux-gnu"
     else
         # Lutris requires extra runtimes from its install path
         RPATH="$RPATH:$(echo $LD_LIBRARY_PATH | tr ':' $'\n' | grep '/lutris/runtime/' | tr $'\n' ':')"

@@ -112,6 +112,10 @@ echo
 
 if [[ $ERRORS -gt 0 ]] || [[ $WARNINGS -gt 0 ]]; then
     . dependency-resolvers/detect.sh
+    if [ -z ${RESOLVE_DEPS+x} ]; then
+        error "Failed to load dependency resolver"
+        exit 1
+    fi
     RESOLVE_DEPS
 else
     success "All required and recommended dependencies and tools found."

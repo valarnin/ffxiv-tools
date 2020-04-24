@@ -67,9 +67,9 @@ if [[ "$(getcap "$PROTON_PATH")" != "" ]]; then
 fi
 
 if [[ "$(echo "$FFXIV_ENVIRON_FINAL" | grep 'export LD_LIBRARY_PATH=')" == "" ]]; then
-    error "Unable to determine runtime LD_LIBRARY_PATH."
-    error "This may indicate something strange with your setup."
-    error "Please submit a new issue to the github repo or contact me via Discord."
+    warn "Unable to determine runtime LD_LIBRARY_PATH."
+    warn "This may indicate something strange with your setup."
+    warn "Continuing is not advised unless you know how to fix any issues that may come up related to missing libraries."
     exit 1
 fi
 
