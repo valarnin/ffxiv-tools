@@ -41,6 +41,7 @@ GENTOO_MISC() {
             error "Could not find logic for misc dep $DEP"
             exit 1
             ;;
+    esac
 }
 
 RESOLVE_DEPS() {

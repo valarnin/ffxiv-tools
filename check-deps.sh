@@ -112,8 +112,9 @@ echo
 
 if [[ $ERRORS -gt 0 ]] || [[ $WARNINGS -gt 0 ]]; then
     . dependency-resolvers/detect.sh
-    if [ -z ${RESOLVE_DEPS+x} ]; then
+    if [[ ! "$(type RESOLVE_DEPS)" = RESOLVE_DEPS\ is\ a\ function* ]]; then
         error "Failed to load dependency resolver"
+        echo "$(type RESOLVE_DEPS)"
         exit 1
     fi
     RESOLVE_DEPS
