@@ -4,8 +4,8 @@
 . helpers/error.sh
 . helpers/deps.sh
 
-HARD_DEPS_32=( libpng12.so.0 )
-HARD_DEPS_64=( libpng12.so.0 )
+HARD_DEPS_32=( libpng12.so.0 libFAudio.so.0 )
+HARD_DEPS_64=( libpng12.so.0 libFAudio.so.0 )
 
 SOFT_DEPS_32=( libgcrypt.so )
 SOFT_DEPS_64=( libgcrypt.so )
