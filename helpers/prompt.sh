@@ -109,7 +109,7 @@ PROMPT_DESKTOP_ENTRIES()
         "Icon=$HOME/.local/share/icons/hicolor/256x256/apps/act_ffxiv.png" \
         "Type=Application" \
         "Terminal=False" \
-        "Categories=Games;" > $HOME/.local/share/applications/ffxiv-run-both.desktop
+        "Categories=Game;" > $HOME/.local/share/applications/ffxiv-run-both.desktop
         printf '%s\n' \
         "[Desktop Entry]" \
         "Name=Final Fantasy XIV" \
@@ -117,7 +117,7 @@ PROMPT_DESKTOP_ENTRIES()
         "Icon=$FFXIV_ICON" \
         "Type=Application" \
         "Terminal=False" \
-        "Categories=Games;" > $HOME/.local/share/applications/ffxiv-run-game.desktop
+        "Categories=Game;" > $HOME/.local/share/applications/ffxiv-run-game.desktop
         printf '%s\n' \
         "[Desktop Entry]" \
         "Name=Advanced Combat Tracker" \
@@ -125,7 +125,7 @@ PROMPT_DESKTOP_ENTRIES()
         "Icon=$HOME/.local/share/icons/hicolor/200x200/apps/act.png" \
         "Type=Application" \
         "Terminal=False" \
-        "Categories=Games;" > $HOME/.local/share/applications/ffxiv-run-act.desktop
+        "Categories=Game;" > $HOME/.local/share/applications/ffxiv-run-act.desktop
         echo "Desktop entries have been created at $HOME/.local/share/applications/"
     fi
 }
