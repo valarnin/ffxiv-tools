@@ -57,7 +57,7 @@ for DEP in "${SOFT_DEPS_32[@]}"; do
     if [[ "$?" -eq 0 ]]; then
         success "Found dependency $DEP..."
     else
-        error "Missing dependency $DEP..."
+        warn "Missing dependency $DEP..."
         MISSING_SOFT_32+=("$DEP")
     fi
 done
@@ -69,7 +69,7 @@ for DEP in "${SOFT_DEPS_64[@]}"; do
     if [[ "$?" -eq 0 ]]; then
         success "Found dependency $DEP..."
     else
-        error "Missing dependency $DEP..."
+        warn "Missing dependency $DEP..."
         MISSING_SOFT_64+=("$DEP")
     fi
 done
@@ -93,7 +93,7 @@ for DEP in "${SOFT_TOOLS[@]}"; do
     if [[ "$?" -eq 0 ]]; then
         success "Found tool $DEP..."
     else
-        error "Missing tool $DEP..."
+        warn "Missing tool $DEP..."
         MISSING_SOFT_TOOLS+=("$DEP")
     fi
 done
@@ -110,14 +110,23 @@ fi
 echo
 echo
 
-if [[ $ERRORS -gt 0 ]] || [[ $WARNINGS -gt 0 ]]; then
+if [[ $ERRORS -gt 0 ]]; then
+    error "Required dependencies are missing."
     . dependency-resolvers/detect.sh
     if [[ ! "$(type RESOLVE_DEPS)" = RESOLVE_DEPS\ is\ a\ function* ]]; then
         error "Failed to load dependency resolver"
-        echo "$(type RESOLVE_DEPS)"
         exit 1
     fi
     RESOLVE_DEPS
+elif [[ $WARNINGS -gt 0 ]]; then
+    warn "Optional dependencies are missing."
+    . dependency-resolvers/detect.sh
+    if [[ ! "$(type RESOLVE_DEPS)" = RESOLVE_DEPS\ is\ a\ function* ]]; then
+        warn "Failed to load dependency resolver. You can continue without resolving soft dependencies."
+        PROMPT_CONTINUE
+    else
+        RESOLVE_DEPS
+    fi
 else
     success "All required and recommended dependencies and tools found."
 fi

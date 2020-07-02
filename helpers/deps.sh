@@ -2,7 +2,7 @@
 
 CHECK_DEP_32() {
     DEP="$1"
-    CHECK="$(ldconfig -p | grep 'x86-64' | grep -P "$DEP$" | wc -l)"
+    CHECK="$(ldconfig -p | grep -v ',x86-64)' | grep -P "$DEP$" | wc -l)"
     if [[ "$CHECK" -gt 0 ]]; then
         return 0;
     else
@@ -12,7 +12,7 @@ CHECK_DEP_32() {
 
 CHECK_DEP_64() {
     DEP="$1"
-    CHECK="$(ldconfig -p | grep -v ',x86-64)' | grep -P "$DEP$" | wc -l)"
+    CHECK="$(ldconfig -p | grep 'x86-64' | grep -P "$DEP$" | wc -l)"
     if [[ "$CHECK" -gt 0 ]]; then
         return 0;
     else
