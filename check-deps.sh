@@ -121,7 +121,7 @@ if [[ $ERRORS -gt 0 ]]; then
 elif [[ $WARNINGS -gt 0 ]]; then
     warn "Optional dependencies are missing."
     . dependency-resolvers/detect.sh
-    if [[ ! "$(type RESOLVE_DEPS)" = RESOLVE_DEPS\ is\ a\ function* ]]; then
+    if [[ ! "$(type RESOLVE_DEPS)" = RESOLVE_DEPS\ is\ a\ function* ]] || [[ "$(type RESOLVE_DEPS)" = *No\ dependency\ resolver\ was\ found\ for\ your\ distro* ]]; then
         warn "Failed to load dependency resolver. You can continue without resolving soft dependencies."
         PROMPT_CONTINUE
     else
