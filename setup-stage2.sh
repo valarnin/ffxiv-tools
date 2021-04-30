@@ -32,6 +32,11 @@ PROTON_VERSION_FULL="$(cat "$PROTON_DIST_PATH/version" | cut -d' ' -f2 | cut -d'
 PROTON_VERSION_MAJOR="$(echo "$PROTON_VERSION_FULL" | cut -d'.' -f1)"
 PROTON_VERSION_MINOR="$(echo "$PROTON_VERSION_FULL" | cut -d'.' -f2)"
 
+if [[ "$PROTON_VERSION_FULL" == "" || "$PROTON_VERSION_MAJOR" == "" || "$PROTON_VERSION_MINOR" == "" ]]; then
+    error "Could not detect Proton version. Please request help in the #ffxiv-linux-discussion channel of the discord."
+    exit 1
+fi
+
 warn 'Note that this process is destructive, meaning that if something goes wrong it can break your wine prefix and/or your proton runner installation'
 echo 'Please make backups of both!'
 echo "wine prefix: $WINEPREFIX"
