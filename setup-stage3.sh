@@ -50,7 +50,7 @@ $SCRIPT_HEADER
 
 . $HOME/bin/ffxiv-env-setup.sh
 cd \$WINEPREFIX
-wine64 "\$WINEPREFIX/drive_c/users/valarnin/Local Settings/Application Data/XIVLauncher/XIVLauncher.exe"
+wine "\$WINEPREFIX/drive_c/users/valarnin/Local Settings/Application Data/XIVLauncher/XIVLauncher.exe"
 EOF
 )
 SCRIPT_START_ACT=$(cat << EOF
@@ -66,7 +66,7 @@ $SCRIPT_HEADER
 
 . $HOME/bin/ffxiv-env-setup.sh
 cd \$WINEPREFIX
-wine64 "\$WINEPREFIX/drive_c/users/valarnin/Local Settings/Application Data/XIVLauncher/XIVLauncher.exe" &
+wine "\$WINEPREFIX/drive_c/users/valarnin/Local Settings/Application Data/XIVLauncher/XIVLauncher.exe" &
 sleep 5
 wine64 "\$(cat \$WINEPREFIX/.ACT_Location)/Advanced Combat Tracker.exe"
 EOF
