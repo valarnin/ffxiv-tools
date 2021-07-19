@@ -37,17 +37,7 @@ if [[ "$HAS_PATH" != "1" ]]; then
     exit 1
 fi
 
-IS_STEAM="$(grep -P 'IS_STEAM="?1"?' $HOME/bin/ffxiv-env-setup.sh | wc -l)"
-
-EXTRA_FLAG=""
 BOOT_DIR=""
-
-if [[ "$IS_STEAM" == "1" ]]; then
-    EXTRA_FLAG="-issteam"
-    # Steam has pwd of game process as game install folder, lutris has pwd of game process as boot folder itself
-    BOOT_DIR="boot/"
-fi
-
 
 SCRIPT_HEADER=$(cat << EOF
 #!/bin/bash
@@ -60,7 +50,7 @@ $SCRIPT_HEADER
 
 . $HOME/bin/ffxiv-env-setup.sh
 cd \$WINEPREFIX
-wine "\$FFXIV_PATH/${BOOT_DIR}ffxivboot.exe" $EXTRA_FLAG
+wine64 "\$WINEPREFIX/drive_c/users/valarnin/Local Settings/Application Data/XIVLauncher/XIVLauncher.exe"
 EOF
 )
 SCRIPT_START_ACT=$(cat << EOF
@@ -76,7 +66,7 @@ $SCRIPT_HEADER
 
 . $HOME/bin/ffxiv-env-setup.sh
 cd \$WINEPREFIX
-wine "\$FFXIV_PATH/${BOOT_DIR}ffxivboot.exe" $EXTRA_FLAG &
+wine64 "\$WINEPREFIX/drive_c/users/valarnin/Local Settings/Application Data/XIVLauncher/XIVLauncher.exe" &
 sleep 5
 wine64 "\$(cat \$WINEPREFIX/.ACT_Location)/Advanced Combat Tracker.exe"
 EOF
