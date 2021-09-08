@@ -31,10 +31,14 @@ wine64 wineboot -fs &>/dev/null
 PROTON_VERSION_FULL="$(cat "$PROTON_DIST_PATH/version" | cut -d' ' -f2 | cut -d'-' -f1)"
 PROTON_VERSION_MAJOR="$(echo "$PROTON_VERSION_FULL" | cut -d'.' -f1)"
 PROTON_VERSION_MINOR="$(echo "$PROTON_VERSION_FULL" | cut -d'.' -f2)"
+PROTON_CUSTOM_LATEST_TAG=$(curl -sL https://api.github.com/repos/GloriousEggroll/proton-ge-custom/releases/latest | jq -r ".tag_name")
+PROTON_VERSION_CUSTOM_LATEST="$(cat "$HOME/.steam/steam/compatibilitytools.d/Proton-$PROTON_CUSTOM_LATEST_TAG/version" | cut -d' ' -f2 | cut -d'-' -f1)"
 
-if [[ "$PROTON_VERSION_FULL" == "" || "$PROTON_VERSION_MAJOR" == "" || "$PROTON_VERSION_MINOR" == "" ]]; then
-    error "Could not detect Proton version. Please request help in the #ffxiv-linux-discussion channel of the discord."
-    exit 1
+if [[ "$PROTON_VERSION_CUSTOM_LATEST" == "" ]]; then
+    if [[ "$PROTON_VERSION_FULL" == "" || "$PROTON_VERSION_MAJOR" == "" || "$PROTON_VERSION_MINOR" == "" ]]; then
+        error "Could not detect Proton version. Please request help in the #ffxiv-linux-discussion channel of the discord."
+        exit 1
+    fi
 fi
 
 warn 'Note that this process is destructive, meaning that if something goes wrong it can break your wine prefix and/or your proton runner installation'
