@@ -50,7 +50,7 @@ $SCRIPT_HEADER
 
 . $HOME/bin/ffxiv-env-setup.sh
 cd \$WINEPREFIX
-wine "\$WINEPREFIX/drive_c/users/$USER/Local Settings/Application Data/XIVLauncher/XIVLauncher.exe"
+wine64 "\$WINEPREFIX/drive_c/users/$USER/Local Settings/Application Data/XIVLauncher/XIVLauncher.exe"
 EOF
 )
 SCRIPT_START_ACT=$(cat << EOF
