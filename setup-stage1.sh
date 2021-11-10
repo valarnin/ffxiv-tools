@@ -31,6 +31,10 @@ FFXIV_ENVIRON_FINAL="$(echo "$FFXIV_ENVIRON" | grep -P "$REQ_ENV_VARS_REGEX")"
 FFXIV_PATH=$(readlink -f /proc/$FFXIV_PID/cwd)
 FFXIV_ENVIRON_FINAL="$FFXIV_ENVIRON_FINAL"$'\n'"export FFXIV_PATH=\"$FFXIV_PATH\""
 
+# Add XIVLauncher path to environment for use in stage3 scripts
+XIVLAUNCHER_PATH="$(cat /proc/94716/cmdline | grep -aPo '.*XIVLauncher.exe')"
+FFXIV_ENVIRON_FINAL="$FFXIV_ENVIRON_FINAL"$'\n'"export XIVLAUNCHER_PATH=\"$XIVLAUNCHER_PATH\""
+
 PROTON_PATH="$(echo "$FFXIV_ENVIRON_FINAL" | grep 'export WINE=' | cut -d'=' -f2)"
 PROTON_DIST_PATH="$(dirname "$(dirname "$PROTON_PATH")")"
 
@@ -68,6 +72,7 @@ echo "Runtime Environment: Lutris"
 echo "wine Executable Location: $PROTON_PATH"
 echo "Proton Distribution Path: $PROTON_DIST_PATH"
 echo "Wine Prefix: $WINEPREFIX"
+echo "XIVLauncher Windows Path: $XIVLAUNCHER_PATH"
 echo
 
 PROMPT_CONTINUE

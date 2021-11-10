@@ -67,7 +67,7 @@ if [ -f "$WINEPREFIX/.ACT_Location" ]; then
     ACT_LOCATION="$(cat "$WINEPREFIX/.ACT_Location")"
 else
     warn "Setup hasn't been run on this wine prefix before"
-    echo "Searching for the ACT install may take some time if this prefix has been highly customized."
+    echo "This script will need to scan your wine prefix to locate ACT if it's already installed."
     PROMPT_CONTINUE
 
     TEMP_ACT_LOCATION="$(find $WINEPREFIX -name 'Advanced Combat Tracker.exe')"

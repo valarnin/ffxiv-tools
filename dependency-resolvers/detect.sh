@@ -13,3 +13,8 @@ if [[ -e "/etc/gentoo-release" ]]; then
     . "$(dirname "${BASH_SOURCE[0]}")/gentoo.sh"
     return
 fi
+
+if [[ -e "/etc/arch-release" ]]; then
+    . "$(dirname "${BASH_SOURCE[0]}")/arch.sh"
+    return
+fi

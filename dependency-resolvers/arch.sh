@@ -1,15 +1,15 @@
 #!/bin/bash
 
-GENTOO_DEP_TO_PACKAGE() {
+ARCH_DEP_TO_PACKAGE() {
     case "$DEP" in
         "unzip")
-            DEP='app-arch/unzip'
+            DEP='extra/unzip'
             ;;
         "patchelf")
-            DEP='dev-util/patchelf'
+            DEP='community/patchelf'
             ;;
         "libgcrypt.so")
-            DEP='dev-libs/libgcrypt'
+            DEP='core/libgcrypt'
             ;;
         *)
             error "Could not resolve dependency for $DEP"
@@ -18,11 +18,11 @@ GENTOO_DEP_TO_PACKAGE() {
     esac
 }
 
-GENTOO_MISC() {
+ARCH_MISC() {
     case "$DEP" in
         "ulimit")
-            echo "Please refer to the Gentoo wiki page here:"
-            echo "https://wiki.gentoo.org/wiki/Security_Handbook/User_and_group_limitations"
+            echo "Please refer to the Arch wiki page here:"
+            echo "https://wiki.archlinux.org/title/Limits.conf"
             echo
             echo "The values that need to be set are as follows:"
             echo "* hard nofile 65535"
@@ -31,6 +31,7 @@ GENTOO_MISC() {
             echo "You must reboot after applying these settings."
             exit 1
             ;;
+        *)
         "wine_deps")
             echo "Please refer to the lutris documentation here:"
             echo "https://github.com/lutris/docs/blob/master/WineDependencies.md"
@@ -46,34 +47,34 @@ GENTOO_MISC() {
 RESOLVE_DEPS() {
     MISSING_UNIQUE=(  )
     for DEP in "${MISSING_HARD_32[@]}"; do
-        GENTOO_DEP_TO_PACKAGE
+        ARCH_DEP_TO_PACKAGE
         MISSING_UNIQUE+=("$DEP")
     done
     for DEP in "${MISSING_HARD_64[@]}"; do
-        GENTOO_DEP_TO_PACKAGE
+        ARCH_DEP_TO_PACKAGE
         MISSING_UNIQUE+=("$DEP")
     done
     for DEP in "${MISSING_SOFT_32[@]}"; do
-        GENTOO_DEP_TO_PACKAGE
+        ARCH_DEP_TO_PACKAGE
         MISSING_UNIQUE+=("$DEP")
     done
     for DEP in "${MISSING_SOFT_64[@]}"; do
-        GENTOO_DEP_TO_PACKAGE
+        ARCH_DEP_TO_PACKAGE
         MISSING_UNIQUE+=("$DEP")
     done
     for DEP in "${MISSING_HARD_TOOLS[@]}"; do
-        GENTOO_DEP_TO_PACKAGE
+        ARCH_DEP_TO_PACKAGE
         MISSING_UNIQUE+=("$DEP")
     done
     for DEP in "${MISSING_SOFT_TOOLS[@]}"; do
-        GENTOO_DEP_TO_PACKAGE
+        ARCH_DEP_TO_PACKAGE
         MISSING_UNIQUE+=("$DEP")
     done
     for DEP in "${MISSING_SOFT_MISC[@]}"; do
-        GENTOO_MISC
+        ARCH_MISC
     done
     for DEP in "${MISSING_HARD_MISC[@]}"; do
-        GENTOO_MISC
+        ARCH_MISC
     done
     MISSING_UNIQUE=($(echo "${MISSING_UNIQUE[@]} | tr ' ' '\n' | sort -u | tr '\n' ' '"))
     echo
@@ -82,7 +83,7 @@ RESOLVE_DEPS() {
     echo "${MISSING_UNIQUE[@]}"
     echo
     PROMPT_CONTINUE
-    sudo emerge -av ${MISSING_UNIQUE[@]}
+    sudo pacman -Syu ${MISSING_UNIQUE[@]}
     if [[ "$?" -ne 0 ]]; then
         exit 1
     fi
