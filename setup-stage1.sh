@@ -32,7 +32,7 @@ FFXIV_PATH=$(readlink -f /proc/$FFXIV_PID/cwd)
 FFXIV_ENVIRON_FINAL="$FFXIV_ENVIRON_FINAL"$'\n'"export FFXIV_PATH=\"$FFXIV_PATH\""
 
 # Add XIVLauncher path to environment for use in stage3 scripts
-XIVLAUNCHER_PATH="$(cat /proc/94716/cmdline | grep -aPo '.*XIVLauncher.exe')"
+XIVLAUNCHER_PATH="$(cat /proc/$FFXIV_PID/cmdline | grep -aPo '.*XIVLauncher.exe')"
 FFXIV_ENVIRON_FINAL="$FFXIV_ENVIRON_FINAL"$'\n'"export XIVLAUNCHER_PATH=\"$XIVLAUNCHER_PATH\""
 
 PROTON_PATH="$(echo "$FFXIV_ENVIRON_FINAL" | grep 'export WINE=' | cut -d'=' -f2)"
