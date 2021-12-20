@@ -19,7 +19,7 @@ echo 'Sourcing the FFXIV environment'
 echo
 echo "Making sure wine isn't running anything"
 
-FFXIV_PID="$(ps axo pid,cmd | grep -Pi 'ffxivlauncher(|64).exe' | grep -vi grep | sed -e 's/^[[:space:]]*//' | cut -d' ' -f1)"
+FFXIV_PID="$(ps axo pid,cmd | grep -m1 -Pi 'ffxivlauncher(|64).exe' | grep -vi grep | sed -e 's/^[[:space:]]*//' | cut -d' ' -f1)"
 
 if [[ "$FFXIV_PID" != "" ]]; then
     warn "FFXIV launcher detected as running, forceably closing it"
