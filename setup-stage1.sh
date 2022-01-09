@@ -110,6 +110,9 @@ FFXIV_ENVIRON="$(cat /proc/$FFXIV_PID/environ | xargs -0 bash -c 'printf "export
 FFXIV_ENVIRON_FINAL="$(echo "$FFXIV_ENVIRON" | grep -P "$FFXIV_ENVIRON_REQ_RGX")"
 
 # Add FFXIV game path to environment for use in stage3 scripts
+# TODO/FIXME: The path is usually (or always?) "/" (root) for some reason,
+# which needs investigation. However, these scripts don't use the stored
+# FFXIV_PATH value for anything so it's a low-priority bug.
 FFXIV_PATH="$(readlink -f /proc/$FFXIV_PID/cwd)"
 FFXIV_ENVIRON_FINAL="$(printf '%s\nexport FFXIV_PATH=%q\n' "$FFXIV_ENVIRON_FINAL" "$FFXIV_PATH")"
 
@@ -144,7 +147,7 @@ WINEPREFIX="$(echo "$FFXIV_ENVIRON_FINAL" | grep 'export WINEPREFIX=' | cut -d'=
 # IMPORTANT: We DON'T escape the already-escaped Proton variables! We MUST use %s instead of %q for those!
 FFXIV_ENVIRON_FINAL="$(printf '%s\nexport PROTON_PATH=%s\n' "$FFXIV_ENVIRON_FINAL" "$PROTON_PATH")"
 FFXIV_ENVIRON_FINAL="$(printf '%s\nexport PROTON_DIST_PATH=%q\n' "$FFXIV_ENVIRON_FINAL" "$PROTON_DIST_PATH")"
-FFXIV_ENVIRON_FINAL="$(printf '%s\nexport PATH=%q:\$PATH\n' "$FFXIV_ENVIRON_FINAL" "$PROTON_DIST_PATH/bin")"
+FFXIV_ENVIRON_FINAL="$(printf '%s\nexport PATH=%q:$PATH\n' "$FFXIV_ENVIRON_FINAL" "$PROTON_DIST_PATH/bin")"
 
 # Check for wine already being setcap'd, and fail if so.
 if [[ "$(getcap $PROTON_PATH)" != "" ]]; then

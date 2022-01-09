@@ -30,7 +30,7 @@ echo
 echo "Current script version: $SCRIPT_VERSION."
 echo
 
-HAS_PATH="$(grep -P 'FFXIV_PATH="' $HOME/$FFXIV_TOOLS_LOCATION/ffxiv-env-setup.sh | wc -l)"
+HAS_PATH="$(grep -P 'export FFXIV_PATH=' $HOME/$FFXIV_TOOLS_LOCATION/ffxiv-env-setup.sh | wc -l)"
 
 if [[ "$HAS_PATH" != "1" ]]; then
     error "Your $HOME/$FFXIV_TOOLS_LOCATION/ffxiv-env-setup.sh script does not have a FFXIV_PATH variable."
