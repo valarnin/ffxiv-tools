@@ -122,7 +122,7 @@ FFXIV_ENVIRON_FINAL="$(printf '%s\nexport FFXIV_PATH=%q\n' "$FFXIV_ENVIRON_FINAL
 # C:\users\foo\AppData\Local\XIVLauncher\app-6.1.15\XIVLauncher.exe
 # Corrected Example:
 # C:\users\foo\AppData\Local\XIVLauncher\XIVLauncher.exe
-XIVLAUNCHER_PATH="$(cat /proc/$FFXIV_PID/cmdline | grep -aPo '.*XIVLauncher.exe' | sed 's/[/\\]app-[^/\\]*\([/\\]\)/\1/g')"
+XIVLAUNCHER_PATH="$(grep -zPo '.*XIVLauncher.exe' /proc/$FFXIV_PID/cmdline | head -z -n 1 | sed -z 's/[/\\]app-[^/\\]*\([/\\]\)/\1/g' | tr -d '\0')"
 FFXIV_ENVIRON_FINAL="$(printf '%s\nexport XIVLAUNCHER_PATH=%q\n' "$FFXIV_ENVIRON_FINAL" "$XIVLAUNCHER_PATH")"
 
 # Generate Proton environment variables based on the Wine runner's location.
