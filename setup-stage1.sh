@@ -133,12 +133,12 @@ FFXIV_ENVIRON_FINAL="$(printf '%s\nexport XIVLAUNCHER_PATH=%q\n' "$FFXIV_ENVIRON
 # to setup-stage1.sh. The other setup scripts read the finished environment file
 # into memory which automatically unescapes everything, so other files actually
 # have to do the opposite (must always quote/escape properly), for ALL variables.
-PROTON_PATH="$(echo "$FFXIV_ENVIRON_FINAL" | grep 'export WINE=' | cut -d'=' -f2)"
+PROTON_PATH="$(echo "$FFXIV_ENVIRON_FINAL" | grep 'export WINE=' | cut -d'=' -f2-)"
 PROTON_DIST_PATH="$(dirname "$(dirname $PROTON_PATH)")"
 
 # Extract the wineprefix value too.
 # IMPORTANT: This is also fully escaped already. Same caveats apply as above.
-WINEPREFIX="$(echo "$FFXIV_ENVIRON_FINAL" | grep 'export WINEPREFIX=' | cut -d'=' -f2)"
+WINEPREFIX="$(echo "$FFXIV_ENVIRON_FINAL" | grep 'export WINEPREFIX=' | cut -d'=' -f2-)"
 
 # Add the final variables to the environment we'll be exporting.
 # IMPORTANT: We DON'T escape the already-escaped Proton variables! We MUST use %s instead of %q for those!
