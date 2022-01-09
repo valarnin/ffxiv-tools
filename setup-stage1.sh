@@ -3,6 +3,9 @@
 . helpers/error.sh
 . helpers/prompt.sh
 
+# Determine where the user wants to install the tools
+. config/ffxiv-tools-location.sh
+
 echo "Setting up the FFXIV Environment scripts."
 echo
 echo "This script will require you to open the FFXIV launcher from Lutris as if you were going to play the game normally"
@@ -77,13 +80,13 @@ echo
 
 PROMPT_CONTINUE
 
-echo "Creating destination directory at $HOME/bin if it doesn't exist"
+echo "Creating destination directory at $HOME/$FFXIV_TOOLS_LOCATION/ if it doesn't exist"
 
-mkdir -p "$HOME/bin"
+mkdir -p "$HOME/$FFXIV_TOOLS_LOCATION"
 
-echo "Creating source-able environment script at $HOME/bin/ffxiv-env-setup.sh"
+echo "Creating source-able environment script at $HOME/$FFXIV_TOOLS_LOCATION/ffxiv-env-setup.sh"
 
-cat << EOF > $HOME/bin/ffxiv-env-setup.sh
+cat << EOF > $HOME/$FFXIV_TOOLS_LOCATION/ffxiv-env-setup.sh
 #!/bin/bash
 $FFXIV_ENVIRON_FINAL
 export WINEDEBUG=-all
@@ -93,15 +96,15 @@ export WINEPREFIX="$WINEPREFIX"
 export PATH="$PROTON_DIST_PATH/bin:\$PATH"
 EOF
 
-chmod +x $HOME/bin/ffxiv-env-setup.sh
+chmod +x $HOME/$FFXIV_TOOLS_LOCATION/ffxiv-env-setup.sh
 
-echo "Creating environment wrapper at $HOME/bin/ffxiv-env.sh"
+echo "Creating environment wrapper at $HOME/$FFXIV_TOOLS_LOCATION/ffxiv-env.sh"
 
-cat << EOF > $HOME/bin/ffxiv-env.sh
+cat << EOF > $HOME/$FFXIV_TOOLS_LOCATION/ffxiv-env.sh
 #!/bin/bash
-. $HOME/bin/ffxiv-env-setup.sh
+. $HOME/$FFXIV_TOOLS_LOCATION/ffxiv-env-setup.sh
 cd \$WINEPREFIX
 /bin/bash
 EOF
 
-chmod +x $HOME/bin/ffxiv-env.sh
+chmod +x $HOME/$FFXIV_TOOLS_LOCATION/ffxiv-env.sh

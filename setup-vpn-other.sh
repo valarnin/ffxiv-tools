@@ -4,13 +4,16 @@
 . helpers/prompt.sh
 . helpers/vpn.sh
 
-SCRIPT_HELPER_DEST="$HOME/bin/ffxiv-vpn-helper.sh"
-SCRIPT_HELPER_CONFIG_DEST="$HOME/bin/ffxiv-vpn-helper-config.sh"
-SCRIPT_RUN_ACT_DEST="$HOME/bin/ffxiv-vpn-run-act.sh"
-SCRIPT_RUN_GAME_DEST="$HOME/bin/ffxiv-vpn-run-game.sh"
-SCRIPT_RUN_BOTH_DEST="$HOME/bin/ffxiv-vpn-run-both.sh"
-SCRIPT_RUN_OTHER_DEST="$HOME/bin/ffxiv-vpn-run-other.sh"
-SCRIPT_RESET_VPN_DEST="$HOME/bin/ffxiv-vpn-reset-vpn.sh"
+# Determine where the user wants to install the tools
+. config/ffxiv-tools-location.sh
+
+SCRIPT_HELPER_DEST="$HOME/$FFXIV_TOOLS_LOCATION/ffxiv-vpn-helper.sh"
+SCRIPT_HELPER_CONFIG_DEST="$HOME/$FFXIV_TOOLS_LOCATION/ffxiv-vpn-helper-config.sh"
+SCRIPT_RUN_ACT_DEST="$HOME/$FFXIV_TOOLS_LOCATION/ffxiv-vpn-run-act.sh"
+SCRIPT_RUN_GAME_DEST="$HOME/$FFXIV_TOOLS_LOCATION/ffxiv-vpn-run-game.sh"
+SCRIPT_RUN_BOTH_DEST="$HOME/$FFXIV_TOOLS_LOCATION/ffxiv-vpn-run-both.sh"
+SCRIPT_RUN_OTHER_DEST="$HOME/$FFXIV_TOOLS_LOCATION/ffxiv-vpn-run-other.sh"
+SCRIPT_RESET_VPN_DEST="$HOME/$FFXIV_TOOLS_LOCATION/ffxiv-vpn-reset-vpn.sh"
 
 echo "This script will set up the required helper scripts but you will need to customize them to match your VPN setup."
 echo "Please edit $SCRIPT_HELPER_DEST after the install is finished"
@@ -155,7 +158,7 @@ EOF
 SCRIPT_RUN_ACT=$(cat << EOF
 $SCRIPT_RUN_COMMON_PRE
 
-RUN_COMMAND "\$(which bash)" "$HOME/bin/ffxiv-run-act.sh"
+RUN_COMMAND "\$(which bash)" "$HOME/$FFXIV_TOOLS_LOCATION/ffxiv-run-act.sh"
 
 $SCRIPT_RUN_COMMON_POST
 EOF
@@ -164,7 +167,7 @@ EOF
 SCRIPT_RUN_GAME=$(cat << EOF
 $SCRIPT_RUN_COMMON_PRE
 
-RUN_COMMAND "\$(which bash)" "$HOME/bin/ffxiv-run-game.sh"
+RUN_COMMAND "\$(which bash)" "$HOME/$FFXIV_TOOLS_LOCATION/ffxiv-run-game.sh"
 
 $SCRIPT_RUN_COMMON_POST
 EOF
@@ -173,7 +176,7 @@ EOF
 SCRIPT_RUN_BOTH=$(cat << EOF
 $SCRIPT_RUN_COMMON_PRE
 
-RUN_COMMAND "\$(which bash)" "$HOME/bin/ffxiv-run-both.sh"
+RUN_COMMAND "\$(which bash)" "$HOME/$FFXIV_TOOLS_LOCATION/ffxiv-run-both.sh"
 
 $SCRIPT_RUN_COMMON_POST
 EOF
@@ -188,7 +191,7 @@ $SCRIPT_RUN_COMMON_POST
 EOF
 )
 
-echo "Scripts built. Writing to $HOME/bin..."
+echo "Scripts built. Writing to $HOME/$FFXIV_TOOLS_LOCATION..."
 
 echo "Writing $SCRIPT_HELPER_CONFIG_DEST"
 echo "$SCRIPT_HELPER_CONFIG" > "$SCRIPT_HELPER_CONFIG_DEST"
@@ -216,4 +219,4 @@ echo "Writing $SCRIPT_RESET_VPN_DEST"
 echo "$SCRIPT_RESET_VPN" > "$SCRIPT_RESET_VPN_DEST"
 chmod +x "$SCRIPT_RESET_VPN_DEST"
 
-echo "Scripts written. Run $HOME/bin/ffxiv-vpn-run-* to run within the VPN scope"
+echo "Scripts written. Run $HOME/$FFXIV_TOOLS_LOCATION/ffxiv-vpn-run-* to run within the VPN scope"

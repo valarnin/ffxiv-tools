@@ -75,11 +75,14 @@ https://github.com/ravahn/machina/pull/9 (fix false positives in linux detection
 
 This entire process has been scripted out for you.
 
-1. Download or clone this repo
-2. Run `./setup.sh`
-3. The setup script will guide you through the rest of the process
+1. Download or clone this repo.
+2. (Optional) You can edit `./config/ffxiv-tools-location.sh` if you want to choose a custom installation path. However, the default path will be the best for most people. Changing the path will make it slightly harder to install newer versions of the script, since you'll have to edit this file every time.
+3. Run `./setup.sh` in a terminal window.
+4. The setup script will guide you through the rest of the process.
 
-Throughout the remainder of this guide, I will refer to the `FFXIV environment`. This can be accessed by running `~/bin/ffxiv-env.sh`.
+Throughout the remainder of this guide, I will refer to the `FFXIV environment`. This can be accessed by running `~/.local/share/ffxiv-tools/ffxiv-env.sh`. This path will differ if you have installed ffxiv-tools to a custom location instead of the default.
+
+Note that you will have to re-run the setup script again in the future if you change to a different the Wine runtime for your game.
 
 # The moment of truth
 

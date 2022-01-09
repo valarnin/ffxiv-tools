@@ -1,5 +1,10 @@
 #!/bin/bash
 
+# Determine where the user wants to install the tools
+# NOTE: Because prompt.sh runs as a child of the main setup scripts,
+# the working dir and $0 refers to the main folder, hence this path.
+. config/ffxiv-tools-location.sh
+
 if [[ "$HELPERS_PROMPT" == "Y" ]]; then
   return;
 fi
@@ -105,7 +110,7 @@ PROMPT_DESKTOP_ENTRIES()
         printf '%s\n' \
         "[Desktop Entry]" \
         "Name=FFXIV & ACT" \
-        "Exec=$HOME/bin/ffxiv-run-both.sh" \
+        "Exec=$HOME/$FFXIV_TOOLS_LOCATION/ffxiv-run-both.sh" \
         "Icon=$HOME/.local/share/icons/hicolor/256x256/apps/act_ffxiv.png" \
         "Type=Application" \
         "Terminal=False" \
@@ -113,7 +118,7 @@ PROMPT_DESKTOP_ENTRIES()
         printf '%s\n' \
         "[Desktop Entry]" \
         "Name=Final Fantasy XIV" \
-        "Exec=$HOME/bin/ffxiv-run-game.sh" \
+        "Exec=$HOME/$FFXIV_TOOLS_LOCATION/ffxiv-run-game.sh" \
         "Icon=$FFXIV_ICON" \
         "Type=Application" \
         "Terminal=False" \
@@ -121,7 +126,7 @@ PROMPT_DESKTOP_ENTRIES()
         printf '%s\n' \
         "[Desktop Entry]" \
         "Name=Advanced Combat Tracker" \
-        "Exec=$HOME/bin/ffxiv-run-act.sh" \
+        "Exec=$HOME/$FFXIV_TOOLS_LOCATION/ffxiv-run-act.sh" \
         "Icon=$HOME/.local/share/icons/hicolor/200x200/apps/act.png" \
         "Type=Application" \
         "Terminal=False" \

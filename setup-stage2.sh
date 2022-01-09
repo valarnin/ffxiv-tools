@@ -3,18 +3,21 @@
 . helpers/error.sh
 . helpers/prompt.sh
 
+# Determine where the user wants to install the tools
+. config/ffxiv-tools-location.sh
+
 echo 'Setting up the Proton environment to run ACT with network capture'
 echo 'This script will set up your wine prefix and proton executables to run ACT, as well as set up a default ACT install for you'
 echo 'If this process is aborted at any Continue prompt, it will resume from that point the next time it is run'
 echo 'Please make sure nothing is running in the wine prefix for FFXIV before continuing'
 
-if [ ! -f "$HOME/bin/ffxiv-env-setup.sh" ]; then
+if [ ! -f "$HOME/$FFXIV_TOOLS_LOCATION/ffxiv-env-setup.sh" ]; then
     error "The FFXIV environment hasn't been configured yet. Please run the stage1 setup first!"
     exit 1
 fi
 
 echo 'Sourcing the FFXIV environment'
-. $HOME/bin/ffxiv-env-setup.sh
+. $HOME/$FFXIV_TOOLS_LOCATION/ffxiv-env-setup.sh
 
 echo
 echo "Making sure wine isn't running anything"
@@ -128,7 +131,7 @@ fi
 echo 'Checking to see if wine binaries need their capabilities set'
 
 if [[ "$(getcap "$(which wine)")" == "" ]]; then
-    warn 'Setting capabilities on wine executables'
+    warn 'Setting network capture capabilities for ACT on your wine executables'
     warn 'This process must be run as root, so you will be prompted for your password'
     warn 'The commands to be run are as follows:'
     echo
