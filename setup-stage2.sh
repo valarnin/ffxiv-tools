@@ -22,6 +22,10 @@ echo 'Sourcing the FFXIV environment'
 echo
 echo "Making sure wine isn't running anything"
 
+# NOTE: This can find multiple PIDs if multiple executables are running in the environment.
+# TODO/FIXME: This will bug out if there are other Wine runtimes on the system that are actively used,
+# and it will forcibly close them. This needs rewriting someday to only close .exe files belonging
+# to the exact Wine runner we are targeting.
 FFXIV_PID="$(ps axo pid,cmd | grep -P '^\s*\d+\s+[A-Z]:\\.*\.exe$' | grep -vi grep | sed -e 's/^[[:space:]]*//' | cut -d' ' -f1)"
 
 if [[ "$FFXIV_PID" != "" ]]; then
@@ -100,9 +104,17 @@ if [[ "$(patchelf --print-rpath "$(which wine)" | grep '$ORIGIN')" != "" || "$(p
     # If there are ever any issues with RPATH patching with paths containing
     # spaces or weird characters, then this chunk of code will need changing!
 
+    # Add the core libraries to RPATH.
     RPATH="${PROTON_DIST_PATH}/lib64:${PROTON_DIST_PATH}/lib"
-    # Lutris requires extra runtimes from its install path
+
+    # Lutris requires additional RPATH from its runtime install path.
+    # TODO/FIXME: This method of extracting the path is risky, since it blindly
+    # replaces all ":" symbols with newlines, without considering that some
+    # of the ":" symbols can be escaped "\:" and legitimately be part of the
+    # directory path. We need a new solution which understands escaped colons,
+    # to avoid the risk of extracting corrupted/fragmented paths.
     RPATH="$RPATH:$(echo $LD_LIBRARY_PATH | tr ':' $'\n' | grep '/lutris/runtime/' | tr $'\n' ':')"
+
     echo 'Patching the rpath of wine executables and libraries'
     echo 'New rpath for binaries:'
     echo
