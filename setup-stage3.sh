@@ -6,7 +6,7 @@
 # Determine where the user wants to install the tools
 . config/ffxiv-tools-location.sh
 
-SCRIPT_VERSION="2"
+SCRIPT_VERSION="3"
 
 should_overwrite()
 {
