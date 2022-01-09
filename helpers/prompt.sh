@@ -102,9 +102,13 @@ PROMPT_DESKTOP_ENTRIES()
         elif [[ "$(find "$HOME/.local/share/icons/hicolor/32x32/apps" -maxdepth 1 -iname 'steam_icon_39210.png' -print -quit 2> /dev/null | wc -l)" -gt 0 ]]; then
             FFXIV_ICON="$HOME/.local/share/icons/hicolor/32x32/apps/steam_icon_39210.png"
         else
+            # This custom icon was created as follows:
+            # wget -O FFXIV_logo.png "https://static.wikia.nocookie.net/finalfantasy/images/b/b3/FFXIV_logo.png"
+            # convert FFXIV_logo.png -background none -gravity east -extent 724x724 xivlogofull.png
+            # convert xivlogofull.png -resize 256x256 -unsharp 2x1.0+1.2 xivlogo256.png
             echo "Could not find FFXIV's icon. Downloading..."
-            wget -O "$HOME/.local/share/icons/hicolor/200x200/apps/ffxiv_icon.png" "https://steamuserimages-a.akamaihd.net/ugc/862859572048700909/04B5C43E1CA6850F56EC76C9D45BFEC128C87A69/" &> /dev/null
-            FFXIV_ICON="$HOME/.local/share/icons/hicolor/200x200/apps/ffxiv_icon.png"
+            wget -O "$HOME/.local/share/icons/hicolor/256x256/apps/ffxiv_icon.png" "https://i.imgur.com/iFoGEUZ.png" &> /dev/null
+            FFXIV_ICON="$HOME/.local/share/icons/hicolor/256x256/apps/ffxiv_icon.png"
         fi
         # signal to the OS cache that there new icons
         touch $HOME/.local/share/icons/hicolor/
