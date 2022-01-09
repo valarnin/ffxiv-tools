@@ -106,6 +106,8 @@ PROMPT_DESKTOP_ENTRIES()
             wget -O "$HOME/.local/share/icons/hicolor/200x200/apps/ffxiv_icon.png" "https://steamuserimages-a.akamaihd.net/ugc/862859572048700909/04B5C43E1CA6850F56EC76C9D45BFEC128C87A69/" &> /dev/null
             FFXIV_ICON="$HOME/.local/share/icons/hicolor/200x200/apps/ffxiv_icon.png"
         fi
+        # signal to the OS cache that there new icons
+        touch $HOME/.local/share/icons/hicolor/
         mkdir -p $HOME/.local/share/applications &> /dev/null
         printf '%s\n' \
         "[Desktop Entry]" \
