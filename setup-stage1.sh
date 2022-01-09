@@ -11,7 +11,7 @@ echo
 echo "This script will require you to open the FFXIV launcher from Lutris as if you were going to play the game normally"
 echo
 
-FFXIV_PID="$(ps axo pid,cmd | grep -P '^\s*\d+\s+[A-Z]:\\.*\\XIVLauncher.exe$' | grep -vi grep | sed -e 's/^[[:space:]]*//' | cut -d' ' -f1)"
+FFXIV_PID="$(ps axo pid,cmd | grep -P '^\s*\d+\s+[A-Z]:\\.*\\XIVLauncher.exe$' | grep -vi grep | tail -n 1 | sed -e 's/^[[:space:]]*//' | cut -d' ' -f1)"
 
 if [[ "$FFXIV_PID" == "" ]]; then
     warn "Please open the XIVLauncher Launcher. Checking for process \"XIVLauncher.exe\"..."
