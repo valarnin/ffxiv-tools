@@ -110,8 +110,8 @@ FFXIV_ENVIRON="$(cat /proc/$FFXIV_PID/environ | xargs -0 bash -c 'printf "export
 FFXIV_ENVIRON_FINAL="$(echo "$FFXIV_ENVIRON" | grep -P "$FFXIV_ENVIRON_REQ_RGX")"
 
 # Add FFXIV game path to environment for use in stage3 scripts
-FFXIV_PATH=$(readlink -f /proc/$FFXIV_PID/cwd)
-FFXIV_ENVIRON_FINAL="$FFXIV_ENVIRON_FINAL"$'\n'"export FFXIV_PATH=\"$FFXIV_PATH\""
+FFXIV_PATH="$(readlink -f /proc/$FFXIV_PID/cwd)"
+FFXIV_ENVIRON_FINAL="$(printf '%s\nexport FFXIV_PATH=%q\n' "$FFXIV_ENVIRON_FINAL" "$FFXIV_PATH")"
 
 # Add XIVLauncher path to environment for use in stage3 scripts
 # Note that if we detect a specific version path, we automatically replace
@@ -123,27 +123,31 @@ FFXIV_ENVIRON_FINAL="$FFXIV_ENVIRON_FINAL"$'\n'"export FFXIV_PATH=\"$FFXIV_PATH\
 # Corrected Example:
 # C:\users\foo\AppData\Local\XIVLauncher\XIVLauncher.exe
 XIVLAUNCHER_PATH="$(cat /proc/$FFXIV_PID/cmdline | grep -aPo '.*XIVLauncher.exe' | sed 's/[/\\]app-[^/\\]*\([/\\]\)/\1/g')"
-FFXIV_ENVIRON_FINAL="$FFXIV_ENVIRON_FINAL"$'\n'"export XIVLAUNCHER_PATH=\"$XIVLAUNCHER_PATH\""
+FFXIV_ENVIRON_FINAL="$(printf '%s\nexport XIVLAUNCHER_PATH=%q\n' "$FFXIV_ENVIRON_FINAL" "$XIVLAUNCHER_PATH")"
 
+# Generate Proton environment variables based on the Wine runner's location.
+# IMPORTANT: The PROTON_PATH is already fully escaped (by printf during extraction),
+# so DON'T wrap it in quotes if using in scripts or function calls. However,
+# the PROTON_DIST_PATH is generated here and WILL NEED quoting.
+# VERY IMPORTANT: These issues regarding already-quoted variables only applies
+# to setup-stage1.sh. The other setup scripts read the finished environment file
+# into memory which automatically unescapes everything, so other files actually
+# have to do the opposite (must always quote/escape properly), for ALL variables.
 PROTON_PATH="$(echo "$FFXIV_ENVIRON_FINAL" | grep 'export WINE=' | cut -d'=' -f2)"
-PROTON_DIST_PATH="$(dirname "$(dirname "$PROTON_PATH")")"
+PROTON_DIST_PATH="$(dirname "$(dirname $PROTON_PATH)")"
 
+# Extract the wineprefix value too.
+# IMPORTANT: This is also fully escaped already. Same caveats apply as above.
 WINEPREFIX="$(echo "$FFXIV_ENVIRON_FINAL" | grep 'export WINEPREFIX=' | cut -d'=' -f2)"
 
-if [[ "$(echo "$PROTON_PATH" | grep '\\ ')" != "" ]] || [[ "$(echo "$WINEPREFIX" | grep '\\ ')" != "" ]]; then
-    error "There is a space in your Proton or Wine Prefix path."
-    error "There's a known issue with spaces causing issues with the setup."
-    error "Please remove spaces from the path(s) and try again."
-    error "Proton distribution path detected: $PROTON_DIST_PATH"
-    error "Proton path detected: $PROTON_PATH"
-    error "Prefix path detected: $WINEPREFIX"
-    error "Full environment detected:"
-    error "$FFXIV_ENVIRON_FINAL"
-    exit 1
-fi
+# Add the final variables to the environment we'll be exporting.
+# IMPORTANT: We DON'T escape the already-escaped Proton variables! We MUST use %s instead of %q for those!
+FFXIV_ENVIRON_FINAL="$(printf '%s\nexport PROTON_PATH=%s\n' "$FFXIV_ENVIRON_FINAL" "$PROTON_PATH")"
+FFXIV_ENVIRON_FINAL="$(printf '%s\nexport PROTON_DIST_PATH=%q\n' "$FFXIV_ENVIRON_FINAL" "$PROTON_DIST_PATH")"
+FFXIV_ENVIRON_FINAL="$(printf '%s\nexport PATH=%q:\$PATH\n' "$FFXIV_ENVIRON_FINAL" "$PROTON_DIST_PATH/bin")"
 
-# Check for wine already being setcap'd, fail if so
-if [[ "$(getcap "$PROTON_PATH")" != "" ]]; then
+# Check for wine already being setcap'd, and fail if so.
+if [[ "$(getcap $PROTON_PATH)" != "" ]]; then
     error "Detected that you're running this against an already configured Proton (the binary at path \"$PROTON_PATH\" has capabilities set already)"
     error "You must run this script against a fresh proton install, or else the LD_LIBRARY_PATH environment variable configured by your runtime cannot be detected"
     exit 1
@@ -173,13 +177,15 @@ mkdir -p "$HOME/$FFXIV_TOOLS_LOCATION"
 
 echo "Creating source-able environment script at $HOME/$FFXIV_TOOLS_LOCATION/ffxiv-env-setup.sh"
 
+# NOTE: We forcibly disable all wine debug output in our environment,
+# to ensure that it's running without logging slowdowns. However, we'll
+# get two WINEDEBUG lines in the output environment. This last one takes
+# precedence, and the user can manually edit their script if they prefer
+# whatever value was retrieved from their Lutris environment instead.
 cat << EOF > $HOME/$FFXIV_TOOLS_LOCATION/ffxiv-env-setup.sh
 #!/bin/bash
 $FFXIV_ENVIRON_FINAL
 export WINEDEBUG=-all
-export PROTON_PATH="$PROTON_PATH"
-export PROTON_DIST_PATH="$PROTON_DIST_PATH"
-export PATH="$PROTON_DIST_PATH/bin:\$PATH"
 EOF
 
 chmod +x $HOME/$FFXIV_TOOLS_LOCATION/ffxiv-env-setup.sh

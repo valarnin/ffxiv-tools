@@ -73,7 +73,7 @@ else
     echo "This script will need to scan your wine prefix to locate ACT if it's already installed."
     PROMPT_CONTINUE
 
-    TEMP_ACT_LOCATION="$(find $WINEPREFIX -name 'Advanced Combat Tracker.exe')"
+    TEMP_ACT_LOCATION="$(find "$WINEPREFIX" -name 'Advanced Combat Tracker.exe')"
 
     if [[ "$TEMP_ACT_LOCATION" == "" ]]; then
         warn 'Could not find ACT install, downloading and installing latest version'
@@ -85,7 +85,7 @@ else
         ACT_LOCATION="$(dirname "$TEMP_ACT_LOCATION")"
     fi
     success "Found ACT location at $ACT_LOCATION"
-    echo "Saving this path to $WINEPREFIX/.ACT_Location for future use"
+    echo "Saving this path to \"$WINEPREFIX/.ACT_Location\" for future use"
     echo "$ACT_LOCATION" > "$WINEPREFIX/.ACT_Location"
 fi
 
@@ -95,6 +95,11 @@ wine64 wineboot -s &>/dev/null
 echo 'Checking to see if wine binaries and libraries need to be patched'
 
 if [[ "$(patchelf --print-rpath "$(which wine)" | grep '$ORIGIN')" != "" || "$(patchelf --print-rpath "$(which wine)")" == "" ]]; then
+    # IMPORTANT: We don't quote/escape the RPATH, since we only give it
+    # to the patchelf executable, and it seems to only want unquoted paths.
+    # If there are ever any issues with RPATH patching with paths containing
+    # spaces or weird characters, then this chunk of code will need changing!
+
     RPATH="${PROTON_DIST_PATH}/lib64:${PROTON_DIST_PATH}/lib"
     # Lutris requires extra runtimes from its install path
     RPATH="$RPATH:$(echo $LD_LIBRARY_PATH | tr ':' $'\n' | grep '/lutris/runtime/' | tr $'\n' ':')"
