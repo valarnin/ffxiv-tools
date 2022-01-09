@@ -35,7 +35,15 @@ FFXIV_PATH=$(readlink -f /proc/$FFXIV_PID/cwd)
 FFXIV_ENVIRON_FINAL="$FFXIV_ENVIRON_FINAL"$'\n'"export FFXIV_PATH=\"$FFXIV_PATH\""
 
 # Add XIVLauncher path to environment for use in stage3 scripts
-XIVLAUNCHER_PATH="$(cat /proc/$FFXIV_PID/cmdline | grep -aPo '.*XIVLauncher.exe')"
+# Note that if we detect a specific version path, we automatically replace
+# the versioned subdirectory with the generic XIVLauncher executable (which
+# auto-runs/downloads the latest XIVLauncher version). We thereby avoid
+# having to reinstall our scripts every time the user upgrades XIVLauncher.
+# Raw Example:
+# C:\users\foo\AppData\Local\XIVLauncher\app-6.1.15\XIVLauncher.exe
+# Corrected Example:
+# C:\users\foo\AppData\Local\XIVLauncher\XIVLauncher.exe
+XIVLAUNCHER_PATH="$(cat /proc/$FFXIV_PID/cmdline | grep -aPo '.*XIVLauncher.exe' | sed 's/[/\\]app-[^/\\]*\([/\\]\)/\1/g')"
 FFXIV_ENVIRON_FINAL="$FFXIV_ENVIRON_FINAL"$'\n'"export XIVLAUNCHER_PATH=\"$XIVLAUNCHER_PATH\""
 
 PROTON_PATH="$(echo "$FFXIV_ENVIRON_FINAL" | grep 'export WINE=' | cut -d'=' -f2)"
