@@ -24,11 +24,90 @@ fi
 success "FFXIV Launcher PID found! ($FFXIV_PID)"
 echo "Building environment information based on FFXIV Launcher env..."
 
-FFXIV_ENVIRON="$(cat /proc/$FFXIV_PID/environ | xargs -0 bash -c 'printf "export %q\n" "$@"')"
+# IMPORTANT: This array is extremely important and must be updated
+# whenever Lutris or its FFXIV wine runtime introduces new environment
+# variables, otherwise there will be plenty of bugs with the launched
+# game (such as delayed sound, glitches), or it may not launch at all.
 
-REQ_ENV_VARS_REGEX="(DRI_PRIME|LD_LIBRARY_PATH|PYTHONPATH|SDL_VIDEO_FULLSCREEN_DISPLAY|WINEDLLPATH|WINEPREFIX|WINE_MONO_OVERRIDES|WINEESYNC|PROTON_VR_RUNTIME|WINEDLLOVERRIDES|WINELOADERNOEXEC|WINEPRELOADRESERVE|DXVK|export WINE=)"
+# To find the exact list of environment variables that Lutris itself
+# is INTENTIONALLY setting when the game is launched, just open
+# a terminal and run the following:
+#
+# "lutris -d"
+#
+# Then start XIVLauncher inside Lutris GUI. There will be lots of
+# debugging information in the terminal. All of the required variables
+# will be listed there, in the following format:
+#
+# "DEBUG    2022-01-09 09:00:23,918 [command.start:139]:DXVK_NVAPIHACK="0""
+#
+# Simply copy the variable names from each line, such as "DXVK_NVAPIHACK",
+# and update the array below.
+#
+# But the easiest and most reliable way to produce the list of variables
+# is by copying all of the "command.start" lines into a text document,
+# and then running the following regex replacement on it:
+#
+# - Search: `^DEBUG    .+? \[command.start:139\]:(.+?)=.+?$`
+# - Replace: `    "\1"`
+#
+# (Don't include the surrounding backticks: `.)
+#
+# That regex will automatically create perfectly formatted lines for you.
+#
+# NOTE: The environment may still contain a few other variables which
+# aren't listed in Lutris debug, but those probably aren't set by Lutris
+# and most likely comes from Wine and the OS itself, so technically
+# we probably don't need to include anything other than what Lutris sets.
+#
+# ALSO NOTE: Unfortunately, we'll only capture the user's CURRENT values,
+# but won't react if they later change some of the game settings in Lutris.
+# However, since most people play the game with default Lutris settings,
+# this risk won't affect most people.
+#
+declare -a FFXIV_ENVIRON_REQUIRED=(
+    # Set by Lutris (Updated: 2022-Jan-09, Wine: "lutris-6.21-6-x86_64")
+    "DISABLE_LAYER_AMD_SWITCHABLE_GRAPHICS_1"
+    "SDL_VIDEO_FULLSCREEN_DISPLAY"
+    "PULSE_LATENCY_MSEC"
+    "LD_LIBRARY_PATH"
+    "DSSENH"
+    "XL_WINEONLINUX"
+    "__GL_SHADER_DISK_CACHE"
+    "__GL_SHADER_DISK_CACHE_PATH"
+    "WINEDEBUG"
+    "WINEARCH"
+    "WINE"
+    "GST_PLUGIN_SYSTEM_PATH_1_0"
+    "WINEPREFIX"
+    "WINEESYNC"
+    "WINEFSYNC"
+    "DXVK_NVAPIHACK"
+    "WINEDLLOVERRIDES"
+    "WINE_LARGE_ADDRESS_AWARE"
+    "game_name"
+    "PYTHONPATH"
+    "LUTRIS_GAME_UUID"
 
-FFXIV_ENVIRON_FINAL="$(echo "$FFXIV_ENVIRON" | grep -P "$REQ_ENV_VARS_REGEX")"
+    # Extras added by us just in case (they won't be included
+    # in our output if they're missing from the environment).
+    "DRI_PRIME"
+    "WINEDLLPATH"
+    "WINE_MONO_OVERRIDES"
+    "PROTON_VR_RUNTIME"
+    "WINELOADERNOEXEC"
+    "WINEPRELOADRESERVE"
+)
+
+# Generate a safe, accurately-matching regex from the array above.
+# NOTE: We use `|` as separator.
+IFS=\| eval 'FFXIV_ENVIRON_REQ_RGX="^export (${FFXIV_ENVIRON_REQUIRED[*]})="'
+
+# Extract the currently running Lutris environment as properly quoted, newline-separated values.
+FFXIV_ENVIRON="$(cat /proc/$FFXIV_PID/environ | xargs -0 bash -c 'printf "export %q\n" "$@"' --)"
+
+# Grab only the exact environment variables that we want.
+FFXIV_ENVIRON_FINAL="$(echo "$FFXIV_ENVIRON" | grep -P "$FFXIV_ENVIRON_REQ_RGX")"
 
 # Add FFXIV game path to environment for use in stage3 scripts
 FFXIV_PATH=$(readlink -f /proc/$FFXIV_PID/cwd)
@@ -100,7 +179,6 @@ $FFXIV_ENVIRON_FINAL
 export WINEDEBUG=-all
 export PROTON_PATH="$PROTON_PATH"
 export PROTON_DIST_PATH="$PROTON_DIST_PATH"
-export WINEPREFIX="$WINEPREFIX"
 export PATH="$PROTON_DIST_PATH/bin:\$PATH"
 EOF
 
