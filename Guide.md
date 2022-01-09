@@ -113,11 +113,20 @@ The plugin's default configuration should use `espeak`, which is barebones and f
 
 ## Transparency and wine/proton
 
-Any plugins that have a transparent background (overlay plugins etc) will cause serious performance problems due to the way the rendering of the transparency works (it has to be rendered entirely on the CPU). We're currently investigating potential linux-specific fixes for this using web sockets (check out my fork of [hudkit](https://github.com/valarnin/hudkit)), for now be aware that having an overlay displayed may cause framerate hitches randomly, especially when the overlay changes in a significant fashion.
+Any plugins that have a transparent background (for example, Overlay plugins) will cause serious performance problems due to the way the rendering of the transparency works (it has to be rendered entirely on the CPU). This can cause significant slowdowns in your game. You should not use any Overlay plugins on Linux.
 
 ## OverlayPlugin/cactbot
 
-`cactbot`, which is a raid helper overlay, now requires the ngld version of the overlayplugin, avialable here: <https://github.com/ngld/OverlayPlugin>
+**OverlayPlugin:**
+
+There are a few different Linux-specific workarounds for the OverlayPlugin performance issues:
+
+- Method 1 (Recommended): Use XIVLauncher with a "browser-based overlay" renderer plugin that works on Linux. The only working plugin at the moment is [NextUI](https://discord.gg/XWcAnNSTe6). Be sure that you install the XIVLauncher plugin version, not their ACT OverlayPlugin.dll version. In ACT, enable OverlayPlugin.dll, but don't create any overlays. Instead, enable the "local WSServer" in OverlayPlugin's settings. Then simply create a viewport in NextUI which loads that local URL.
+- Method 2: Check out my fork of [hudkit](https://github.com/valarnin/hudkit)). It's an alternative way of rendering overlays.
+
+**cactbot:**
+
+`cactbot`, which is a raid helper overlay, now requires the ngld version of the OverlayPlugin, available here: <https://github.com/ngld/OverlayPlugin>
 
 `cactbot` itself is available here: <https://github.com/quisquous/cactbot>
 
