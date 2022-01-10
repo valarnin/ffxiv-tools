@@ -2,6 +2,7 @@
 
 . helpers/error.sh
 . helpers/prompt.sh
+. helpers/funcs.sh
 
 # Determine where the user wants to install the tools
 . config/ffxiv-tools-location.sh
