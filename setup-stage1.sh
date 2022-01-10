@@ -119,7 +119,7 @@ FFXIV_ENVIRON_FINAL="$(echo "$FFXIV_ENVIRON" | grep -P "$FFXIV_ENVIRON_REQ_RGX")
 # which needs investigation. However, these scripts don't use the stored
 # FFXIV_PATH value for anything so it's a low-priority bug.
 FFXIV_PATH="$(readlink -f /proc/$FFXIV_PID/cwd)"
-FFXIV_ENVIRON_FINAL="$(printf '%s\nexport FFXIV_PATH=%q\n' "$FFXIV_ENVIRON_FINAL" "$FFXIV_PATH")"
+printf -v FFXIV_ENVIRON_FINAL '%s\nexport FFXIV_PATH=%q' "$FFXIV_ENVIRON_FINAL" "$FFXIV_PATH" 
 
 # Add XIVLauncher path to environment for use in stage3 scripts
 # Note that if we detect a specific version path, we automatically replace
@@ -131,33 +131,28 @@ FFXIV_ENVIRON_FINAL="$(printf '%s\nexport FFXIV_PATH=%q\n' "$FFXIV_ENVIRON_FINAL
 # Corrected Example:
 # C:\users\foo\AppData\Local\XIVLauncher\XIVLauncher.exe
 XIVLAUNCHER_PATH="$(grep -zPo '.*XIVLauncher.exe' /proc/$FFXIV_PID/cmdline | head -z -n 1 | sed -z 's/[/\\]app-[^/\\]*\([/\\]\)/\1/g' | tr -d '\0')"
-FFXIV_ENVIRON_FINAL="$(printf '%s\nexport XIVLAUNCHER_PATH=%q\n' "$FFXIV_ENVIRON_FINAL" "$XIVLAUNCHER_PATH")"
+printf -v FFXIV_ENVIRON_FINAL '%s\nexport XIVLAUNCHER_PATH=%q' "$FFXIV_ENVIRON_FINAL" "$XIVLAUNCHER_PATH" 
 
 # Generate Proton environment variables based on the Wine runner's location.
-# IMPORTANT: The PROTON_PATH is already fully escaped (by printf during extraction),
-# so DON'T wrap it in quotes if using in scripts or function calls. However,
-# the PROTON_DIST_PATH is generated here and WILL NEED quoting.
-# VERY IMPORTANT: These issues regarding already-quoted variables only applies
-# to setup-stage1.sh. The other setup scripts read the finished environment file
-# into memory which automatically unescapes everything, so other files actually
-# have to do the opposite (must always quote/escape properly), for ALL variables.
+# IMPORTANT: We MUST use the "eval" (and no quotes around the variable) to unescape the "printf %q" data from our raw env string.
 PROTON_PATH="$(echo "$FFXIV_ENVIRON_FINAL" | grep 'export WINE=' | cut -d'=' -f2-)"
-PROTON_DIST_PATH="$(dirname "$(dirname $PROTON_PATH)")"
+eval PROTON_PATH=$PROTON_PATH
+PROTON_DIST_PATH="$(dirname "$(dirname "$PROTON_PATH")")"
 
 # Extract the wineprefix value too.
-# IMPORTANT: This is also fully escaped already. Same caveats apply as above.
+# IMPORTANT: This is also fully escaped already, so we unescape it with "eval" too.
 WINEPREFIX="$(echo "$FFXIV_ENVIRON_FINAL" | grep 'export WINEPREFIX=' | cut -d'=' -f2-)"
+eval WINEPREFIX=$WINEPREFIX
 
 # Add the final variables to the environment we'll be exporting.
-# IMPORTANT: We DON'T escape the already-escaped Proton variables! We MUST use %s instead of %q for those!
-FFXIV_ENVIRON_FINAL="$(printf '%s\nexport PROTON_PATH=%s\n' "$FFXIV_ENVIRON_FINAL" "$PROTON_PATH")"
-FFXIV_ENVIRON_FINAL="$(printf '%s\nexport PROTON_DIST_PATH=%q\n' "$FFXIV_ENVIRON_FINAL" "$PROTON_DIST_PATH")"
-FFXIV_ENVIRON_FINAL="$(printf '%s\nexport PATH=%q:$PATH\n' "$FFXIV_ENVIRON_FINAL" "$PROTON_DIST_PATH/bin")"
+printf -v FFXIV_ENVIRON_FINAL '%s\nexport PROTON_PATH=%q' "$FFXIV_ENVIRON_FINAL" "$PROTON_PATH" 
+printf -v FFXIV_ENVIRON_FINAL '%s\nexport PROTON_DIST_PATH=%q' "$FFXIV_ENVIRON_FINAL" "$PROTON_DIST_PATH" 
+printf -v FFXIV_ENVIRON_FINAL '%s\nexport PATH=%q:$PATH' "$FFXIV_ENVIRON_FINAL" "$PROTON_DIST_PATH/bin" 
 
 # Check for wine already being setcap'd, and fail if so.
-if [[ "$(getcap $PROTON_PATH)" != "" ]]; then
-    error "Detected that you're running this against an already configured Proton (the binary at path \"$PROTON_PATH\" has capabilities set already)"
-    error "You must run this script against a fresh proton install, or else the LD_LIBRARY_PATH environment variable configured by your runtime cannot be detected"
+if [[ "$(getcap "$PROTON_PATH")" != "" ]]; then
+    error "Detected that you're running this against an already configured Proton (the binary at path \"$PROTON_PATH\" has capabilities set already)."
+    error "You must run this script against a fresh proton install, or else the LD_LIBRARY_PATH environment variable configured by your runtime cannot be detected."
     exit 1
 fi
 
