@@ -2,6 +2,7 @@
 
 . helpers/error.sh
 . helpers/prompt.sh
+. helpers/funcs.sh
 
 # Determine where the user wants to install the tools
 . config/ffxiv-tools-location.sh
@@ -20,18 +21,25 @@ echo 'Sourcing the FFXIV environment'
 . $HOME/$FFXIV_TOOLS_LOCATION/ffxiv-env-setup.sh
 
 echo
-echo "Making sure wine isn't running anything"
+echo "Making sure that Wine isn't running anything..."
 
-# NOTE: This can find multiple PIDs if multiple executables are running in the environment.
-# TODO/FIXME: This will bug out if there are other Wine runtimes on the system that are actively used,
-# and it will forcibly close them. This needs rewriting someday to only close .exe files belonging
-# to the exact Wine runner we are targeting.
-FFXIV_PID="$(ps axo pid,cmd | grep -P '^\s*\d+\s+[A-Z]:\\.*\.exe$' | grep -vi grep | sed -e 's/^[[:space:]]*//' | cut -d' ' -f1)"
-
-if [[ "$FFXIV_PID" != "" ]]; then
-    warn "FFXIV launcher detected as running, forceably closing it"
-    kill -9 $FFXIV_PID
-fi
+# Close all Wine ".exe" processes.
+# NOTE: Since we scan for the newest PID each time, we'll properly close
+# the programs in the reverse order of how they were started!
+# TODO/FIXME: This is harmful if there are other Wine runtimes on the system
+# that are actively used, since it will forcibly close their programs.
+# This regex needs rewriting someday to only close .exe files belonging
+# to the exact FFXIV Wine runner we are targeting. Or perhaps just targeting
+# XIVLauncher, FFXIV's own launcher, FFXIV's main process, and ACT?
+# Or another alternative may be to find a way to signal our specific wine
+# runner (the FFXIV container's) to itself terminate all running programs?
+while true; do
+    GET_NEWEST_PID "WINE_EXE_PID" '[A-Z]:\\.*\.exe$'; PID_SUCCESS=$?
+    [[ "$PID_SUCCESS" -ne 0 ]] && break
+    warn "Detected Wine process ($WINE_EXE_PID). Forcing it to exit..."
+    kill -9 "$WINE_EXE_PID"
+    sleep 0.5
+done
 
 wine64 wineboot -fs &>/dev/null
 
@@ -53,7 +61,8 @@ if [[ "$PROTON_VERSION_FULL" == "" || "$PROTON_VERSION_MAJOR" == "" || "$PROTON_
     exit 1
 fi
 
-warn 'Note that this process is destructive, meaning that if something goes wrong it can break your wine prefix and/or your proton runner installation'
+echo
+warn 'Note that the next step is destructive, meaning that if something goes wrong it can break your wine prefix and/or your proton runner installation.'
 echo 'Please make backups of both!'
 echo "Wine prefix: $WINEPREFIX"
 echo "Proton distribution: $PROTON_DIST_PATH"
