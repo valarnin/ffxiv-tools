@@ -66,7 +66,7 @@ echo "Building environment information based on FFXIV Launcher env..."
 # this risk won't affect most people.
 #
 declare -a FFXIV_ENVIRON_REQUIRED=(
-    # Set by Lutris (Updated: 2022-Jan-09, Wine: "lutris-6.21-6-x86_64")
+    # CORE ENVIRONMENT by Lutris (Updated: 2022-Jan-09, Wine: "lutris-6.21-6-x86_64")
     "DISABLE_LAYER_AMD_SWITCHABLE_GRAPHICS_1"
     "SDL_VIDEO_FULLSCREEN_DISPLAY"
     "PULSE_LATENCY_MSEC"
@@ -89,8 +89,15 @@ declare -a FFXIV_ENVIRON_REQUIRED=(
     "PYTHONPATH"
     "LUTRIS_GAME_UUID"
 
+    # GAMEPAD ENVIRONMENT (used when player has configured
+    # a gamepad in Lutris, not visible in env otherwise).
+    "SDL_GAMECONTROLLERCONFIG"
+    "SDL_GAMECONTROLLER_ALLOW_STEAM_VIRTUAL_GAMEPAD"
+    "SDL_GAMECONTROLLER_IGNORE_DEVICES"
+
     # Extras added by us just in case (they won't be included
     # in our output if they're missing from the environment).
+    "SDL_VIDEO_X11_DGAMOUSE"
     "DRI_PRIME"
     "WINEDLLPATH"
     "WINE_MONO_OVERRIDES"
