@@ -20,7 +20,7 @@ VPN_COUNT="${#VPN_NAMES[*]}"
 
 VPN_CONFIG_PIA() {
     echo "Downloading PIA VPN configuration file..."
-    wget -O/tmp/pia_vpn.zip 'https://www.privateinternetaccess.com/openvpn/openvpn.zip' &> /dev/null
+    wget -O /tmp/pia_vpn.zip 'https://www.privateinternetaccess.com/openvpn/openvpn.zip' &> /dev/null
 
     OIFS="$IFS"
     IFS=$'\n'
@@ -39,7 +39,7 @@ VPN_CONFIG_CUSTOM_DOWNLOAD() {
     echo "If you need to extract or something, use the local file option instead."
     read -p "Download URL? " DL_URL
 
-    wget -O/tmp/vpn_config.conf "$DL_URL" &> /dev/null
+    wget -O /tmp/vpn_config.conf "$DL_URL" &> /dev/null
 
     if [ ! -e "/tmp/vpn_config.conf" ]; then
         error "Failed to download config file"
