@@ -121,7 +121,7 @@ CLOSE_VPN() {
 }
 
 RUN_COMMAND() {
-    ip netns exec "\$FFXIV_VPN_NAMESPACE" sudo -u "\$TARGET_USER" \$@
+    ip netns exec "\$FFXIV_VPN_NAMESPACE" sudo -u "\$TARGET_USER" "\$@"
 }
 
 EOF
@@ -185,7 +185,7 @@ EOF
 SCRIPT_RUN_OTHER=$(cat << EOF
 $SCRIPT_RUN_COMMON_PRE
 
-RUN_COMMAND \$@
+RUN_COMMAND "\$@"
 
 $SCRIPT_RUN_COMMON_POST
 EOF
