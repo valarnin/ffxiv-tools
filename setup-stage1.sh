@@ -2,6 +2,7 @@
 
 . helpers/error.sh
 . helpers/prompt.sh
+. helpers/funcs.sh
 
 # Determine where the user wants to install the tools
 . config/ffxiv-tools-location.sh
@@ -11,15 +12,12 @@ echo
 echo "This script will require you to open the FFXIV launcher from Lutris as if you were going to play the game normally"
 echo
 
-FFXIV_PID="$(ps axo pid,cmd | grep -P '^\s*\d+\s+[A-Z]:\\.*\\XIVLauncher.exe$' | grep -vi grep | tail -n 1 | sed -e 's/^[[:space:]]*//' | cut -d' ' -f1)"
-
-if [[ "$FFXIV_PID" == "" ]]; then
-    warn "Please open the XIVLauncher Launcher. Checking for process \"XIVLauncher.exe\"..."
-    while [[ "$FFXIV_PID" == "" ]]; do
-        sleep 1
-        FFXIV_PID="$(ps axo pid,cmd | grep -P '^\s*\d+\s+[A-Z]:\\.*\\XIVLauncher\.exe$'| grep -vi grep | sed -e 's/^[[:space:]]*//' | cut -d' ' -f1)"
-    done
-fi
+while true; do
+    GET_NEWEST_PID "FFXIV_PID" '[A-Z]:\\.*\\XIVLauncher.exe$'; PID_SUCCESS=$?
+    [[ "$PID_SUCCESS" -eq 0 ]] && break
+    [[ -z "$XIVLAUNCHER_WARN" ]] && { warn "Please open the XIVLauncher Launcher. Checking for process \"XIVLauncher.exe\"..."; XIVLAUNCHER_WARN="Y"; }
+    sleep 1
+done
 
 success "FFXIV Launcher PID found! ($FFXIV_PID)"
 echo "Building environment information based on FFXIV Launcher env..."
