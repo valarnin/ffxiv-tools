@@ -190,21 +190,21 @@ echo "Creating source-able environment script at $HOME/$FFXIV_TOOLS_LOCATION/ffx
 # get two WINEDEBUG lines in the output environment. This last one takes
 # precedence, and the user can manually edit their script if they prefer
 # whatever value was retrieved from their Lutris environment instead.
-cat << EOF > $HOME/$FFXIV_TOOLS_LOCATION/ffxiv-env-setup.sh
+cat << EOF > "$HOME/$FFXIV_TOOLS_LOCATION/ffxiv-env-setup.sh"
 #!/bin/bash
 $FFXIV_ENVIRON_FINAL
 export WINEDEBUG=-all
 EOF
 
-chmod +x $HOME/$FFXIV_TOOLS_LOCATION/ffxiv-env-setup.sh
+chmod +x "$HOME/$FFXIV_TOOLS_LOCATION/ffxiv-env-setup.sh"
 
 echo "Creating environment wrapper at $HOME/$FFXIV_TOOLS_LOCATION/ffxiv-env.sh"
 
-cat << EOF > $HOME/$FFXIV_TOOLS_LOCATION/ffxiv-env.sh
+cat << EOF > "$HOME/$FFXIV_TOOLS_LOCATION/ffxiv-env.sh"
 #!/bin/bash
-. $HOME/$FFXIV_TOOLS_LOCATION/ffxiv-env-setup.sh
-cd \$WINEPREFIX
+. "$HOME/$FFXIV_TOOLS_LOCATION/ffxiv-env-setup.sh"
+cd "\$WINEPREFIX"
 /bin/bash
 EOF
 
-chmod +x $HOME/$FFXIV_TOOLS_LOCATION/ffxiv-env.sh
+chmod +x "$HOME/$FFXIV_TOOLS_LOCATION/ffxiv-env.sh"

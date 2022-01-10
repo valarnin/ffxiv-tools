@@ -110,33 +110,41 @@ PROMPT_DESKTOP_ENTRIES()
             wget -O "$HOME/.local/share/icons/hicolor/256x256/apps/ffxiv_icon.png" "https://i.imgur.com/iFoGEUZ.png" &> /dev/null
             FFXIV_ICON="$HOME/.local/share/icons/hicolor/256x256/apps/ffxiv_icon.png"
         fi
-        # signal to the OS cache that there new icons
-        touch $HOME/.local/share/icons/hicolor/
-        mkdir -p $HOME/.local/share/applications &> /dev/null
+        # Signal to the OS cache that there new icons.
+        touch "$HOME/.local/share/icons/hicolor/"
+        mkdir -p "$HOME/.local/share/applications" &> /dev/null
+        # Create the desktop files.
+        # IMPORTANT: Desktop files are complicated. The Icon line must never
+        # be escaped even if the path contains spaces. However, the Exec
+        # line must instead ALWAYS be escaped. A common trick for running
+        # programs with spaces is to execute `sh -c '"command here"'` which
+        # then runs the space-containing path as a command in a sub-shell,
+        # and that trick is also backwards-compatible with older desktops which
+        # lacked support for double-quote escaping. That's what we'll do here!
         printf '%s\n' \
         "[Desktop Entry]" \
         "Name=FFXIV & ACT" \
-        "Exec=$HOME/$FFXIV_TOOLS_LOCATION/ffxiv-run-both.sh" \
+        "Exec=sh -c '\"$HOME/$FFXIV_TOOLS_LOCATION/ffxiv-run-both.sh\"'" \
         "Icon=$HOME/.local/share/icons/hicolor/256x256/apps/act_ffxiv.png" \
         "Type=Application" \
         "Terminal=False" \
-        "Categories=Game;" > $HOME/.local/share/applications/ffxiv-run-both.desktop
+        "Categories=Game;" > "$HOME/.local/share/applications/ffxiv-run-both.desktop"
         printf '%s\n' \
         "[Desktop Entry]" \
         "Name=Final Fantasy XIV" \
-        "Exec=$HOME/$FFXIV_TOOLS_LOCATION/ffxiv-run-game.sh" \
+        "Exec=sh -c '\"$HOME/$FFXIV_TOOLS_LOCATION/ffxiv-run-game.sh\"'" \
         "Icon=$FFXIV_ICON" \
         "Type=Application" \
         "Terminal=False" \
-        "Categories=Game;" > $HOME/.local/share/applications/ffxiv-run-game.desktop
+        "Categories=Game;" > "$HOME/.local/share/applications/ffxiv-run-game.desktop"
         printf '%s\n' \
         "[Desktop Entry]" \
         "Name=Advanced Combat Tracker" \
-        "Exec=$HOME/$FFXIV_TOOLS_LOCATION/ffxiv-run-act.sh" \
+        "Exec=sh -c '\"$HOME/$FFXIV_TOOLS_LOCATION/ffxiv-run-act.sh\"'" \
         "Icon=$HOME/.local/share/icons/hicolor/200x200/apps/act.png" \
         "Type=Application" \
         "Terminal=False" \
-        "Categories=Game;" > $HOME/.local/share/applications/ffxiv-run-act.desktop
+        "Categories=Game;" > "$HOME/.local/share/applications/ffxiv-run-act.desktop"
         echo "Desktop entries have been created at $HOME/.local/share/applications/"
     fi
 }

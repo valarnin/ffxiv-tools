@@ -18,7 +18,7 @@ if [ ! -f "$HOME/$FFXIV_TOOLS_LOCATION/ffxiv-env-setup.sh" ]; then
 fi
 
 echo 'Sourcing the FFXIV environment'
-. $HOME/$FFXIV_TOOLS_LOCATION/ffxiv-env-setup.sh
+. "$HOME/$FFXIV_TOOLS_LOCATION/ffxiv-env-setup.sh"
 
 echo
 echo "Making sure that Wine isn't running anything..."

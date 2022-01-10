@@ -31,7 +31,7 @@ echo
 echo "Current script version: $SCRIPT_VERSION."
 echo
 
-HAS_PATH="$(grep -P 'export FFXIV_PATH=' $HOME/$FFXIV_TOOLS_LOCATION/ffxiv-env-setup.sh | wc -l)"
+HAS_PATH="$(grep -P 'export FFXIV_PATH=' "$HOME/$FFXIV_TOOLS_LOCATION/ffxiv-env-setup.sh" | wc -l)"
 
 if [[ "$HAS_PATH" != "1" ]]; then
     error "Your $HOME/$FFXIV_TOOLS_LOCATION/ffxiv-env-setup.sh script does not have a FFXIV_PATH variable."
@@ -52,24 +52,24 @@ EOF
 SCRIPT_START_GAME=$(cat << EOF
 $SCRIPT_HEADER
 
-. $HOME/$FFXIV_TOOLS_LOCATION/ffxiv-env-setup.sh
-cd \$WINEPREFIX
+. "$HOME/$FFXIV_TOOLS_LOCATION/ffxiv-env-setup.sh"
+cd "\$WINEPREFIX"
 wine64 "\$XIVLAUNCHER_PATH"
 EOF
 )
 SCRIPT_START_ACT=$(cat << EOF
 $SCRIPT_HEADER
 
-. $HOME/$FFXIV_TOOLS_LOCATION/ffxiv-env-setup.sh
-cd \$WINEPREFIX
+. "$HOME/$FFXIV_TOOLS_LOCATION/ffxiv-env-setup.sh"
+cd "\$WINEPREFIX"
 wine64 "\$(cat "\$WINEPREFIX/.ACT_Location")/Advanced Combat Tracker.exe"
 EOF
 )
 SCRIPT_START_BOTH=$(cat << EOF
 $SCRIPT_HEADER
 
-. $HOME/$FFXIV_TOOLS_LOCATION/ffxiv-env-setup.sh
-cd \$WINEPREFIX
+. "$HOME/$FFXIV_TOOLS_LOCATION/ffxiv-env-setup.sh"
+cd "\$WINEPREFIX"
 wine64 "\$XIVLAUNCHER_PATH" &
 sleep 5
 wine64 "\$(cat "\$WINEPREFIX/.ACT_Location")/Advanced Combat Tracker.exe"
