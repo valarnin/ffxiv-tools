@@ -82,7 +82,7 @@ PROMPT_DESKTOP_ENTRIES()
     CONTINUE=""
     
     if [[ "$(find "$HOME/.local/share/applications" -maxdepth 1 -iname 'ffxiv-run-act.desktop' -print -quit 2> /dev/null | wc -l)" -gt 0 ]]; then
-        echo "Desktop entries have already been created"
+        echo "Desktop entries have already been created."
         CONTINUE="n"
     fi
 
@@ -91,28 +91,25 @@ PROMPT_DESKTOP_ENTRIES()
     done
 
     if [[ "$CONTINUE" == "N" || "$CONTINUE" == "n" ]]; then
-        echo "Skipping entry creation"
+        echo "Skipping desktop entry creation."
     else
         mkdir -p "$HOME/.local/share/icons/hicolor/200x200/apps" &> /dev/null
         mkdir -p "$HOME/.local/share/icons/hicolor/256x256/apps" &> /dev/null
+
+        # Download our custom icons.
+        # NOTE: Our custom FFXIV icon (ffxiv_icon.png) was created as follows:
+        #   wget -O FFXIV_logo.png "https://static.wikia.nocookie.net/finalfantasy/images/b/b3/FFXIV_logo.png"
+        #   convert FFXIV_logo.png -background none -gravity east -extent 724x724 xivlogofull.png
+        #   convert xivlogofull.png -resize 256x256 -unsharp 2x1.0+1.2 ffxiv_icon.png
         wget -O "$HOME/.local/share/icons/hicolor/200x200/apps/act.png" "https://forums.advancedcombattracker.com/uploads/userpics/821/pRS0T7AHQ1UUH.png" &> /dev/null
         wget -O "$HOME/.local/share/icons/hicolor/256x256/apps/act_ffxiv.png" "https://advancedcombattracker.com/act_data/act_ffxiv.png" &> /dev/null
-        if [[ "$(find "$HOME/.local/share/icons/hicolor/128x128/apps" -maxdepth 1 -iname 'lutris_final-fantasy-xiv-a-realm-reborn.png' -print -quit 2> /dev/null | wc -l)" -gt 0 ]]; then
-            FFXIV_ICON="$HOME/.local/share/icons/hicolor/128x128/apps/lutris_final-fantasy-xiv-a-realm-reborn.png"
-        elif [[ "$(find "$HOME/.local/share/icons/hicolor/32x32/apps" -maxdepth 1 -iname 'steam_icon_39210.png' -print -quit 2> /dev/null | wc -l)" -gt 0 ]]; then
-            FFXIV_ICON="$HOME/.local/share/icons/hicolor/32x32/apps/steam_icon_39210.png"
-        else
-            # This custom icon was created as follows:
-            # wget -O FFXIV_logo.png "https://static.wikia.nocookie.net/finalfantasy/images/b/b3/FFXIV_logo.png"
-            # convert FFXIV_logo.png -background none -gravity east -extent 724x724 xivlogofull.png
-            # convert xivlogofull.png -resize 256x256 -unsharp 2x1.0+1.2 xivlogo256.png
-            echo "Could not find FFXIV's icon. Downloading..."
-            wget -O "$HOME/.local/share/icons/hicolor/256x256/apps/ffxiv_icon.png" "https://i.imgur.com/iFoGEUZ.png" &> /dev/null
-            FFXIV_ICON="$HOME/.local/share/icons/hicolor/256x256/apps/ffxiv_icon.png"
-        fi
-        # Signal to the OS cache that there new icons.
+        wget -O "$HOME/.local/share/icons/hicolor/256x256/apps/ffxiv_icon.png" "https://i.imgur.com/iFoGEUZ.png" &> /dev/null
+        FFXIV_ICON="$HOME/.local/share/icons/hicolor/256x256/apps/ffxiv_icon.png"
+
+        # Signal to the OS cache that there are new icons.
         touch "$HOME/.local/share/icons/hicolor/"
         mkdir -p "$HOME/.local/share/applications" &> /dev/null
+
         # Create the desktop files.
         # IMPORTANT: Desktop files are complicated. The Icon line must never
         # be escaped even if the path contains spaces. However, the Exec
@@ -145,6 +142,7 @@ PROMPT_DESKTOP_ENTRIES()
         "Type=Application" \
         "Terminal=False" \
         "Categories=Game;" > "$HOME/.local/share/applications/ffxiv-run-act.desktop"
+
         echo "Desktop entries have been created at $HOME/.local/share/applications/"
     fi
 }
