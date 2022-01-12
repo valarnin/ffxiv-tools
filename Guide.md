@@ -132,7 +132,7 @@ There are a few different Linux-specific workarounds for the OverlayPlugin perfo
 
 ## FFLogs Uploader
 
-FFLogs uploader is an electron app and should work normally as long as it's installed to the same wine prefix as FFXIV and ACT. If you want a native solution, [ngld](https://github.com/ngld) has created a script to repackage the uploader as a native app. Requires `node`, `yarn`, and `7z`, available in this repo as `fflogs-wrapper.sh`.
+The official FFLogs Uploader supports Linux. Simply [grab the Linux version](https://www.fflogs.com/client/download/), mark the downloaded "AppImage" file as executable, and then double-click it to run.
 
 ## Upgrading Proton
 
