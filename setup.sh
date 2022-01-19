@@ -28,5 +28,6 @@ if [[ "$?" == "1" ]]; then
     exit 1
 fi
 
-# Call setup-stage3.sh to add helper scripts to ~/bin
+# Call setup-stage3.sh to add helper scripts to ~/.local/share/ffxiv-tools/
+# That path may differ if the user has edited ./config/ffxiv-tools-location.sh
 ./setup-stage3.sh

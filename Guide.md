@@ -75,11 +75,14 @@ https://github.com/ravahn/machina/pull/9 (fix false positives in linux detection
 
 This entire process has been scripted out for you.
 
-1. Download or clone this repo
-2. Run `./setup.sh`
-3. The setup script will guide you through the rest of the process
+1. Download or clone this repo.
+2. (Optional) You can edit `./config/ffxiv-tools-location.sh` if you want to choose a custom installation path. However, the default path will be the best for most people. Changing the path will make it slightly harder to install newer versions of the script, since you'll have to edit this file every time.
+3. Run `./setup.sh` in a terminal window.
+4. The setup script will guide you through the rest of the process.
 
-Throughout the remainder of this guide, I will refer to the `FFXIV environment`. This can be accessed by running `~/bin/ffxiv-env.sh`.
+Throughout the remainder of this guide, I will refer to the `FFXIV environment`. This can be accessed by running `~/.local/share/ffxiv-tools/ffxiv-env.sh`. This path will differ if you have installed ffxiv-tools to a custom location instead of the default.
+
+Note that you will have to re-run the setup script again in the future if you change to a different the Wine runtime for your game.
 
 # The moment of truth
 
@@ -110,17 +113,26 @@ The plugin's default configuration should use `espeak`, which is barebones and f
 
 ## Transparency and wine/proton
 
-Any plugins that have a transparent background (overlay plugins etc) will cause serious performance problems due to the way the rendering of the transparency works (it has to be rendered entirely on the CPU). We're currently investigating potential linux-specific fixes for this using web sockets (check out my fork of [hudkit](https://github.com/valarnin/hudkit)), for now be aware that having an overlay displayed may cause framerate hitches randomly, especially when the overlay changes in a significant fashion.
+Any plugins that have a transparent background (for example, Overlay plugins) will cause serious performance problems due to the way the rendering of the transparency works (it has to be rendered entirely on the CPU). This can cause significant slowdowns in your game. You should not use any Overlay plugins on Linux.
 
 ## OverlayPlugin/cactbot
 
-`cactbot`, which is a raid helper overlay, now requires the ngld version of the overlayplugin, avialable here: <https://github.com/ngld/OverlayPlugin>
+**OverlayPlugin:**
+
+There are a few different Linux-specific workarounds for the OverlayPlugin performance issues:
+
+- Method 1 (Recommended): Use XIVLauncher with a "browser-based overlay" renderer plugin that works on Linux. The only working plugin at the moment is [NextUI](https://discord.gg/XWcAnNSTe6). Be sure that you install the XIVLauncher plugin version, not their ACT OverlayPlugin.dll version. In ACT, enable OverlayPlugin.dll, but don't create any overlays. Instead, enable the "local WSServer" in OverlayPlugin's settings. Then simply create a viewport in NextUI which loads that local URL.
+- Method 2: Check out my fork of [hudkit](https://github.com/valarnin/hudkit)). It's an alternative way of rendering overlays.
+
+**cactbot:**
+
+`cactbot`, which is a raid helper overlay, now requires the ngld version of the OverlayPlugin, available here: <https://github.com/ngld/OverlayPlugin>
 
 `cactbot` itself is available here: <https://github.com/quisquous/cactbot>
 
 ## FFLogs Uploader
 
-FFLogs uploader is an electron app and should work normally as long as it's installed to the same wine prefix as FFXIV and ACT. If you want a native solution, [ngld](https://github.com/ngld) has created a script to repackage the uploader as a native app. Requires `node`, `yarn`, and `7z`, available in this repo as `fflogs-wrapper.sh`.
+The official FFLogs Uploader supports Linux. Simply [grab the Linux version](https://www.fflogs.com/client/download/), mark the downloaded "AppImage" file as executable, and then double-click it to run.
 
 ## Upgrading Proton
 

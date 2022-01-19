@@ -2,29 +2,44 @@
 
 . helpers/error.sh
 . helpers/prompt.sh
+. helpers/funcs.sh
+
+# Determine where the user wants to install the tools
+. config/ffxiv-tools-location.sh
 
 echo 'Setting up the Proton environment to run ACT with network capture'
 echo 'This script will set up your wine prefix and proton executables to run ACT, as well as set up a default ACT install for you'
 echo 'If this process is aborted at any Continue prompt, it will resume from that point the next time it is run'
 echo 'Please make sure nothing is running in the wine prefix for FFXIV before continuing'
 
-if [ ! -f "$HOME/bin/ffxiv-env-setup.sh" ]; then
+if [ ! -f "$HOME/$FFXIV_TOOLS_LOCATION/ffxiv-env-setup.sh" ]; then
     error "The FFXIV environment hasn't been configured yet. Please run the stage1 setup first!"
     exit 1
 fi
 
 echo 'Sourcing the FFXIV environment'
-. $HOME/bin/ffxiv-env-setup.sh
+. "$HOME/$FFXIV_TOOLS_LOCATION/ffxiv-env-setup.sh"
 
 echo
-echo "Making sure wine isn't running anything"
+echo "Making sure that Wine isn't running anything..."
 
-FFXIV_PID="$(ps axo pid,cmd | grep -P '^\s*\d+\s+[A-Z]:\\.*\.exe$' | grep -vi grep | sed -e 's/^[[:space:]]*//' | cut -d' ' -f1)"
-
-if [[ "$FFXIV_PID" != "" ]]; then
-    warn "FFXIV launcher detected as running, forceably closing it"
-    kill -9 $FFXIV_PID
-fi
+# Close all Wine ".exe" processes.
+# NOTE: Since we scan for the newest PID each time, we'll properly close
+# the programs in the reverse order of how they were started!
+# TODO/FIXME: This is harmful if there are other Wine runtimes on the system
+# that are actively used, since it will forcibly close their programs.
+# This regex needs rewriting someday to only close .exe files belonging
+# to the exact FFXIV Wine runner we are targeting. Or perhaps just targeting
+# XIVLauncher, FFXIV's own launcher, FFXIV's main process, and ACT?
+# Or another alternative may be to find a way to signal our specific wine
+# runner (the FFXIV container's) to itself terminate all running programs?
+while true; do
+    GET_NEWEST_PID "WINE_EXE_PID" '[A-Z]:\\.*\.exe$'; PID_SUCCESS=$?
+    [[ "$PID_SUCCESS" -ne 0 ]] && break
+    warn "Detected Wine process ($WINE_EXE_PID). Forcing it to exit..."
+    kill -9 "$WINE_EXE_PID"
+    sleep 0.5
+done
 
 wine64 wineboot -fs &>/dev/null
 
@@ -46,7 +61,8 @@ if [[ "$PROTON_VERSION_FULL" == "" || "$PROTON_VERSION_MAJOR" == "" || "$PROTON_
     exit 1
 fi
 
-warn 'Note that this process is destructive, meaning that if something goes wrong it can break your wine prefix and/or your proton runner installation'
+echo
+warn 'Note that the next step is destructive, meaning that if something goes wrong it can break your wine prefix and/or your proton runner installation.'
 echo 'Please make backups of both!'
 echo "Wine prefix: $WINEPREFIX"
 echo "Proton distribution: $PROTON_DIST_PATH"
@@ -70,7 +86,7 @@ else
     echo "This script will need to scan your wine prefix to locate ACT if it's already installed."
     PROMPT_CONTINUE
 
-    TEMP_ACT_LOCATION="$(find $WINEPREFIX -name 'Advanced Combat Tracker.exe')"
+    TEMP_ACT_LOCATION="$(find "$WINEPREFIX" -name 'Advanced Combat Tracker.exe')"
 
     if [[ "$TEMP_ACT_LOCATION" == "" ]]; then
         warn 'Could not find ACT install, downloading and installing latest version'
@@ -82,7 +98,7 @@ else
         ACT_LOCATION="$(dirname "$TEMP_ACT_LOCATION")"
     fi
     success "Found ACT location at $ACT_LOCATION"
-    echo "Saving this path to $WINEPREFIX/.ACT_Location for future use"
+    echo "Saving this path to \"$WINEPREFIX/.ACT_Location\" for future use"
     echo "$ACT_LOCATION" > "$WINEPREFIX/.ACT_Location"
 fi
 
@@ -92,9 +108,22 @@ wine64 wineboot -s &>/dev/null
 echo 'Checking to see if wine binaries and libraries need to be patched'
 
 if [[ "$(patchelf --print-rpath "$(which wine)" | grep '$ORIGIN')" != "" || "$(patchelf --print-rpath "$(which wine)")" == "" ]]; then
+    # IMPORTANT: We don't quote/escape the RPATH, since we only give it
+    # to the patchelf executable, and it seems to only want unquoted paths.
+    # If there are ever any issues with RPATH patching with paths containing
+    # spaces or weird characters, then this chunk of code will need changing!
+
+    # Add the core libraries to RPATH.
     RPATH="${PROTON_DIST_PATH}/lib64:${PROTON_DIST_PATH}/lib"
-    # Lutris requires extra runtimes from its install path
+
+    # Lutris requires additional RPATH from its runtime install path.
+    # TODO/FIXME: This method of extracting the path is risky, since it blindly
+    # replaces all ":" symbols with newlines, without considering that some
+    # of the ":" symbols can be escaped "\:" and legitimately be part of the
+    # directory path. We need a new solution which understands escaped colons,
+    # to avoid the risk of extracting corrupted/fragmented paths.
     RPATH="$RPATH:$(echo $LD_LIBRARY_PATH | tr ':' $'\n' | grep '/lutris/runtime/' | tr $'\n' ':')"
+
     echo 'Patching the rpath of wine executables and libraries'
     echo 'New rpath for binaries:'
     echo
@@ -128,7 +157,7 @@ fi
 echo 'Checking to see if wine binaries need their capabilities set'
 
 if [[ "$(getcap "$(which wine)")" == "" ]]; then
-    warn 'Setting capabilities on wine executables'
+    warn 'Setting network capture capabilities for ACT on your wine executables'
     warn 'This process must be run as root, so you will be prompted for your password'
     warn 'The commands to be run are as follows:'
     echo
