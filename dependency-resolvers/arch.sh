@@ -76,7 +76,7 @@ RESOLVE_DEPS() {
     for DEP in "${MISSING_HARD_MISC[@]}"; do
         ARCH_MISC
     done
-    MISSING_UNIQUE=($(echo "${MISSING_UNIQUE[@]} | tr ' ' '\n' | sort -u | tr '\n' ' '"))
+    MISSING_UNIQUE=($(echo "${MISSING_UNIQUE[@]}" | tr ' ' '\n' | sort -u | tr '\n' ' '))
     echo
     warn "Installing the following dependencies:"
     echo 
