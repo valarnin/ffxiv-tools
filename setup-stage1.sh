@@ -13,7 +13,7 @@ echo "This script will require you to open the FFXIV launcher from Lutris as if 
 echo
 
 while true; do
-    GET_NEWEST_PID "FFXIV_PID" '[A-Z]:\\.*\\XIVLauncher.exe$'; PID_SUCCESS=$?
+    GET_NEWEST_PID "FFXIV_PID" '[A-Z]:\\.*\\XIVLauncher.exe(?: --steamticket=[^\s]+)?$'; PID_SUCCESS=$?
     [[ "$PID_SUCCESS" -eq 0 ]] && break
     [[ -z "$XIVLAUNCHER_WARN" ]] && { warn "Please open the XIVLauncher Launcher. Checking for process \"XIVLauncher.exe\"..."; XIVLAUNCHER_WARN="Y"; }
     sleep 1
