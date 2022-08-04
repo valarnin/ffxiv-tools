@@ -9,13 +9,13 @@
 
 echo "Setting up the FFXIV Environment scripts."
 echo
-echo "This script will require you to open the FFXIV launcher from Lutris as if you were going to play the game normally"
+echo "This script will require you to launch the game from XIVLauncher Core."
 echo
 
 while true; do
-    GET_NEWEST_PID "FFXIV_PID" '[A-Z]:\\.*\\XIVLauncher.exe(?: --steamticket=[^\s]+)?$'; PID_SUCCESS=$?
+    GET_NEWEST_PID "FFXIV_PID" '[A-Z]:\\.*\\ffxiv_dx11.exe(?: --steamticket=[^\s]+)?'; PID_SUCCESS=$?
     [[ "$PID_SUCCESS" -eq 0 ]] && break
-    [[ -z "$XIVLAUNCHER_WARN" ]] && { warn "Please open the XIVLauncher Launcher. Checking for process \"XIVLauncher.exe\"..."; XIVLAUNCHER_WARN="Y"; }
+    [[ -z "$XIVLAUNCHER_WARN" ]] && { warn "Please open the game. looking for process \"ffxiv_dx11.exe\""; XIVLAUNCHER_WARN="Y"; }
     sleep 1
 done
 
@@ -153,13 +153,6 @@ printf -v FFXIV_ENVIRON_FINAL '%s\nexport PATH=%q:$PATH' "$FFXIV_ENVIRON_FINAL" 
 if [[ "$(getcap "$PROTON_PATH")" != "" ]]; then
     error "Detected that you're running this against an already configured Proton (the binary at path \"$PROTON_PATH\" has capabilities set already)."
     error "You must run this script against a fresh proton install, or else the LD_LIBRARY_PATH environment variable configured by your runtime cannot be detected."
-    exit 1
-fi
-
-if [[ "$(echo "$FFXIV_ENVIRON_FINAL" | grep 'export LD_LIBRARY_PATH=')" == "" ]]; then
-    warn "Unable to determine runtime LD_LIBRARY_PATH."
-    warn "This may indicate something strange with your setup."
-    warn "Continuing is not advised unless you know how to fix any issues that may come up related to missing libraries."
     exit 1
 fi
 
