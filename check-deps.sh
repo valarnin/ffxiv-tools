@@ -10,7 +10,7 @@ HARD_DEPS_64=( libFAudio.so.0 )
 SOFT_DEPS_32=(  )
 SOFT_DEPS_64=( libgcrypt.so )
 
-HARD_TOOLS=( unzip wget git )
+HARD_TOOLS=( unzip wget )
 SOFT_TOOLS=(  )
 
 MISSING_HARD_32=(  )
