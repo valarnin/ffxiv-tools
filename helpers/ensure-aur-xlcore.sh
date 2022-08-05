@@ -6,14 +6,14 @@ CHECK_FOR_FLATPAK() {
         # dev.goats.xivlauncher is the current flatpak name for XLCore on flathub. Change this if that name changes for some reason.
         if flatpak list --app | grep "dev.goats.xivlauncher"; then
             error "Detected the flatpak version of XLCore. ACT cannot run in a flatpak environment. Please back up your .xlcore directory, uninstall the flatpak, and re-run this script."
-            return 1
+            exit 1
         else
             success "Flatpak installation not present, checking for AUR build now..."
-            return CHECK_FOR_AUR
+            return CONTROL_FORK_DISTRO
         fi
     else
         warn "Flatpak is not installed. Continuing under the assumption that you cannot install a flatpak without it."
-        return CHECK_FOR_AUR
+        return CONTROL_FORK_DISTRO
     fi
 }
 
@@ -47,9 +47,11 @@ CHECK_FOR_MPR() {
         success "Found MPR XLCore. please ensure that the following setting is set in your XIVLauncher UI:"
         echo "Settings -> Wine -> Installation Type should be \"Managed by XIVLauncher\""
         echo "This is generally the correct setting regardless of whether you wish to use ACT. You should not use system WINE to run ff14."
+        echo "If you haven't run the game at least once, do so now and rerun setup.sh"
         return 0
     else 
-        warn "XLCore not found. please install it using makedeb or an MPR helper such as una."
+        warn "xivlauncher-git not found. please install it using makedeb or an MPR helper such as una."
+        echo "Then launch the game, close it, and rerun setup.sh"
         exit 1
     fi
 }
@@ -74,6 +76,8 @@ ARCH_INSTALL_XLCORE() {
         warn "The command to be run is the following:"
         warn "sudo pacman --upgrade $PACKAGE_BALL"
         sudo pacman --upgrade $PACKAGE_BALL
-        cd $RETURN_DIRECTORY
+        echo "You must now start XIVLauncher.core and run the game for the first time in order to populate the directories that are required for the next steps."
+        echo "You may then run setup.sh again."
+        exit 0
     fi
 }

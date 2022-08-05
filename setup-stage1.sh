@@ -21,7 +21,6 @@ done
 
 success "FFXIV Launcher PID found! ($FFXIV_PID)"
 echo "Building environment information based on FFXIV Launcher env..."
-
 # IMPORTANT: This array is extremely important and must be updated
 # whenever Lutris or its FFXIV wine runtime introduces new environment
 # variables, otherwise there will be plenty of bugs with the launched
@@ -132,6 +131,8 @@ printf -v FFXIV_ENVIRON_FINAL '%s\nexport FFXIV_PATH=%q' "$FFXIV_ENVIRON_FINAL" 
 # C:\users\foo\AppData\Local\XIVLauncher\XIVLauncher.exe
 XIVLAUNCHER_PATH="$(grep -zPo '.*XIVLauncher.exe' /proc/$FFXIV_PID/cmdline | head -z -n 1 | sed -z 's/[/\\]app-[^/\\]*\([/\\]\)/\1/g' | tr -d '\0')"
 printf -v FFXIV_ENVIRON_FINAL '%s\nexport XIVLAUNCHER_PATH=%q' "$FFXIV_ENVIRON_FINAL" "$XIVLAUNCHER_PATH" 
+
+
 
 # Generate Proton environment variables based on the Wine runner's location.
 # IMPORTANT: We MUST use the "eval" (and no quotes around the variable) to unescape the "printf %q" data from our raw env string.

@@ -45,28 +45,11 @@ wine64 wineboot -fs &>/dev/null
 
 PROTON_VERSION_FULL=""
 
-if [[ -f "$PROTON_DIST_PATH/version" ]]; then
-    PROTON_VERSION_FULL="$(cat "$PROTON_DIST_PATH/version" | cut -d' ' -f2 | cut -d'-' -f1)"
-fi
-
-if [[ "$PROTON_VERSION_FULL" == "" ]]; then
-    PROTON_VERSION_FULL="$(echo "$PROTON_DIST_PATH" | grep -Po '\d\.\d+')"
-fi
-
-PROTON_VERSION_MAJOR="$(echo "$PROTON_VERSION_FULL" | cut -d'.' -f1)"
-PROTON_VERSION_MINOR="$(echo "$PROTON_VERSION_FULL" | cut -d'.' -f2)"
-
-if [[ "$PROTON_VERSION_FULL" == "" || "$PROTON_VERSION_MAJOR" == "" || "$PROTON_VERSION_MINOR" == "" ]]; then
-    error "Could not detect Proton version. Please request help in the #ffxiv-linux-discussion channel of the discord."
-    exit 1
-fi
-
 echo
 warn 'Note that the next step is destructive, meaning that if something goes wrong it can break your wine prefix and/or your proton runner installation.'
 echo 'Please make backups of both!'
 echo "Wine prefix: $WINEPREFIX"
 echo "Proton distribution: $PROTON_DIST_PATH"
-echo "Proton version: ${PROTON_VERSION_MAJOR}.${PROTON_VERSION_MINOR}"
 
 PROMPT_BACKUP
 
@@ -104,55 +87,6 @@ fi
 
 echo "Making sure wine isn't running anything"
 wine64 wineboot -s &>/dev/null
-
-echo 'Checking to see if wine binaries and libraries need to be patched'
-
-if [[ "$(patchelf --print-rpath "$(which wine)" | grep '$ORIGIN')" != "" || "$(patchelf --print-rpath "$(which wine)")" == "" ]]; then
-    # IMPORTANT: We don't quote/escape the RPATH, since we only give it
-    # to the patchelf executable, and it seems to only want unquoted paths.
-    # If there are ever any issues with RPATH patching with paths containing
-    # spaces or weird characters, then this chunk of code will need changing!
-
-    # Add the core libraries to RPATH.
-    RPATH="${PROTON_DIST_PATH}/lib64:${PROTON_DIST_PATH}/lib"
-
-    # Lutris requires additional RPATH from its runtime install path.
-    # TODO/FIXME: This method of extracting the path is risky, since it blindly
-    # replaces all ":" symbols with newlines, without considering that some
-    # of the ":" symbols can be escaped "\:" and legitimately be part of the
-    # directory path. We need a new solution which understands escaped colons,
-    # to avoid the risk of extracting corrupted/fragmented paths.
-    RPATH="$RPATH:$(echo $LD_LIBRARY_PATH | tr ':' $'\n' | grep '/lutris/runtime/' | tr $'\n' ':')"
-
-    echo 'Patching the rpath of wine executables and libraries'
-    echo 'New rpath for binaries:'
-    echo
-    echo "$RPATH"
-    PROMPT_CONTINUE
-    patchelf --set-rpath "$RPATH" "$(which wine)"
-    patchelf --set-rpath "$RPATH" "$(which wine64)"
-    patchelf --set-rpath "$RPATH" "$(which wineserver)"
-    PATCH_LIB_RPATH="Yes"
-    if [[ "$PROTON_VERSION_MAJOR" -ge "5" ]]; then
-        warn 'Detected a Proton version greater than 4.X'
-        echo 'There was a change in wine/proton somewhere after 4.21 which caused the libraries to not need their rpath patched'
-        echo 'The lowest known version after 4.21 which does not require the rpath to be patched is 5.2'
-        if [[ "$PROTON_VERSION_MAJOR" -gt "5" || "$PROTON_VERSION_MINOR" -ge "2" ]]; then
-            success 'Detected proton version 5.2 or later, skipping patching the rpath'
-            PATCH_LIB_RPATH="No"
-        else
-            PATCH_LIB_RPATH=""
-            warn 'Please let us know what your proton version is and if patching the rpath was required, so that we can narrow the window for where this change was made.'
-            while [[ "$PATCH_LIB_RPATH" != "Yes" && "$PATCH_LIB_RPATH" != "No" ]]; do
-                read -p "Do you want to patch the rpath? [Yes/No] " PATCH_LIB_RPATH
-            done
-        fi
-    fi
-    if [[ "$PATCH_LIB_RPATH" == "Yes" ]]; then
-        find "${PROTON_DIST_PATH}/lib64" -type f | xargs -I{} patchelf --set-rpath "$RPATH" {} &> /dev/null
-        find "${PROTON_DIST_PATH}/lib" -type f | xargs -I{} patchelf --set-rpath "$RPATH" {} &> /dev/null
-    fi
-fi
 
 echo 'Checking to see if wine binaries need their capabilities set'
 
