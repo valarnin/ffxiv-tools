@@ -43,5 +43,3 @@ CHECK_FOR_MPR() {
         echo "This is generally the correct setting regardless of whether you wish to use ACT. You should not use system WINE to run ff14."
 
 }
-
-CHECK_FOR_FLATPAK
