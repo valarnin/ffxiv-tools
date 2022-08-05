@@ -5,6 +5,7 @@
 . helpers/funcs.sh
 . helpers/ensure-aur-xlcore.sh
 
+. config/xlcore.sh
 # Determine where the user wants to install the tools
 . config/ffxiv-tools-location.sh
 
@@ -129,24 +130,17 @@ printf -v FFXIV_ENVIRON_FINAL '%s\nexport FFXIV_PATH=%q' "$FFXIV_ENVIRON_FINAL" 
 XIVLAUNCHER_PATH="/opt/XIVLauncher/XIVLauncher.Core"
 printf -v FFXIV_ENVIRON_FINAL '%s\nexport XIVLAUNCHER_PATH=%q' "$FFXIV_ENVIRON_FINAL" "$XIVLAUNCHER_PATH" 
 
-
-
-# Generate Proton environment variables based on the Wine runner's location.
-# IMPORTANT: We MUST use the "eval" (and no quotes around the variable) to unescape the "printf %q" data from our raw env string.
-# TODO: update this to use xlcore wine
 MANAGED_WINE=$(grep 'WineStartupType' $HOME/.xlcore/launcher.ini | sed 's/WineStartupType=\(.*\)/\1/')
-echo $MANAGED_WINE
 if [[ $MANAGED_WINE == *"Managed"* ]]; then
-    echo "managed"
-    PROTON_PATH="$HOME/.xlcore/compatibilitytool/beta/wine-xiv-staging-fsync-git-7.10.r3.g560db77d/bin/wine"
+    PROTON_PATH="$HOME/.xlcore/compatibilitytool/beta/$XLCORE_WINE_VERSION/bin/wine"
 else
-    echo "not_managed"
     PROTON_PATH=$(grep 'WineBinaryPath' $HOME/.xlcore/launcher.ini | sed 's/WineBinaryPath=\(.*\)/\1/')
 fi
 PROTON_DIST_PATH="$(dirname "$(dirname "$PROTON_PATH")")"
 
 # Extract the wineprefix value too.
 # IMPORTANT: This is also fully escaped already, so we unescape it with "eval" too.
+# Works perfectly based on the lutris script, so has been left unchanged. -Arkevorkhat
 WINEPREFIX="$(echo "$FFXIV_ENVIRON_FINAL" | grep 'export WINEPREFIX=' | cut -d'=' -f2-)"
 eval WINEPREFIX=$WINEPREFIX
 
@@ -159,7 +153,7 @@ printf -v FFXIV_ENVIRON_FINAL '%s\nexport PATH=%q:$PATH' "$FFXIV_ENVIRON_FINAL" 
 if [[ "$(getcap "$PROTON_PATH")" != "" ]]; then
     error "Detected that you're running this against an already configured Proton (the binary at path \"$PROTON_PATH\" has capabilities set already)."
     error "You must run this script against a fresh proton install, or else the LD_LIBRARY_PATH environment variable configured by your runtime cannot be detected."
-    # exit 1
+    exit 1
 fi
 
 echo

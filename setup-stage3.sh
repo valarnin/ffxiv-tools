@@ -48,31 +48,30 @@ SCRIPT_HEADER=$(cat << EOF
 # If you want to modify this script yourself, delete the following line to prevent newer versions of setup-stage3.sh from overwriting your changes.
 # VERSION=$SCRIPT_VERSION
 EOF
-) # TODO: update this script to start xivlauncher core.
+)
 SCRIPT_START_GAME=$(cat << EOF
 $SCRIPT_HEADER
 
 . "$HOME/$FFXIV_TOOLS_LOCATION/ffxiv-env-setup.sh"
-cd "\$WINEPREFIX"
-wine64 "\$XIVLAUNCHER_PATH"
+"\$XIVLAUNCHER_PATH"
 EOF
-) # TODO: update this script to use static wine64 location.
+)
 SCRIPT_START_ACT=$(cat << EOF
 $SCRIPT_HEADER
 
 . "$HOME/$FFXIV_TOOLS_LOCATION/ffxiv-env-setup.sh"
 cd "\$WINEPREFIX"
-wine64 "\$(cat "\$WINEPREFIX/.ACT_Location")/Advanced Combat Tracker.exe"
+"\$PROTON_DIST_PATH/bin/wine64" "\$(cat "\$WINEPREFIX/.ACT_Location")/Advanced Combat Tracker.exe"
 EOF
-) # TODO: update this script to use static wine64 location and start xivlauncher core.
+)
 SCRIPT_START_BOTH=$(cat << EOF
 $SCRIPT_HEADER
 
 . "$HOME/$FFXIV_TOOLS_LOCATION/ffxiv-env-setup.sh"
 cd "\$WINEPREFIX"
-wine64 "\$XIVLAUNCHER_PATH" &
+"\$XIVLAUNCHER_PATH" &
 sleep 5
-wine64 "\$(cat "\$WINEPREFIX/.ACT_Location")/Advanced Combat Tracker.exe"
+"\$PROTON_DIST_PATH/bin/wine64" "\$(cat "\$WINEPREFIX/.ACT_Location")/Advanced Combat Tracker.exe"
 EOF
 )
 
