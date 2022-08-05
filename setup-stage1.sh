@@ -114,7 +114,8 @@ FFXIV_ENVIRON="$(cat /proc/$FFXIV_PID/environ | xargs -0 bash -c 'printf "export
 FFXIV_ENVIRON_FINAL="$(echo "$FFXIV_ENVIRON" | grep -P "$FFXIV_ENVIRON_REQ_RGX")"
 
 # Add FFXIV game path to environment for use in stage3 scripts
-# TODO/FIXME: The path is usually (or always?) "/" (root) for some reason,
+# T ODO/F IXME: The path is usually (or always?) "/" (root) for some reason,
+# TODO: update this code to use the static ffxiv install location in xlcore
 # which needs investigation. However, these scripts don't use the stored
 # FFXIV_PATH value for anything so it's a low-priority bug.
 FFXIV_PATH="$(readlink -f /proc/$FFXIV_PID/cwd)"

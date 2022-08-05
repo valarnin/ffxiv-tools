@@ -101,6 +101,8 @@ PROMPT_DESKTOP_ENTRIES()
         #   wget -O FFXIV_logo.png "https://static.wikia.nocookie.net/finalfantasy/images/b/b3/FFXIV_logo.png"
         #   convert FFXIV_logo.png -background none -gravity east -extent 724x724 xivlogofull.png
         #   convert xivlogofull.png -resize 256x256 -unsharp 2x1.0+1.2 ffxiv_icon.png
+
+        # TODO: Discuss with Valarnin the possibility of replacing the FFXIV logo with a Dalamud logo. -Arkevorkhat
         wget -O "$HOME/.local/share/icons/hicolor/200x200/apps/act.png" "https://forums.advancedcombattracker.com/uploads/userpics/821/pRS0T7AHQ1UUH.png" &> /dev/null
         wget -O "$HOME/.local/share/icons/hicolor/256x256/apps/act_ffxiv.png" "https://advancedcombattracker.com/act_data/act_ffxiv.png" &> /dev/null
         wget -O "$HOME/.local/share/icons/hicolor/256x256/apps/ffxiv_icon.png" "https://i.imgur.com/iFoGEUZ.png" &> /dev/null

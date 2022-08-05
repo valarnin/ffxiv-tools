@@ -5,7 +5,8 @@ CHECK_FOR_FLATPAK() {
     if command -v flatpak &>/dev/null; then
         # dev.goats.xivlauncher is the current flatpak name for XLCore on flathub. Change this if that name changes for some reason.
         if flatpak list --app | grep "dev.goats.xivlauncher"; then
-            error "Detected the flatpak version of XLCore. ACT cannot run in a flatpak environment. Please back up your .xlcore directory, uninstall the flatpak, and re-run this script."
+            error "Detected the flatpak version of XLCore. ACT cannot run in a flatpak environment. Please back up and delete your .xlcore directory, uninstall the flatpak, install the AUR/MPR build of XIVLauncher-git, and re-run this script."
+            echo ""
             exit 1
         else
             success "Flatpak installation not present, checking for AUR build now..."
@@ -37,7 +38,6 @@ CHECK_FOR_AUR() {
     else
         warn "XLCore not found. Would you like to install it now?"
         PROMPT_CONTINUE
-        RETURN_DIRECTORY=pwd
         ARCH_INSTALL_XLCORE
     fi
 }
@@ -48,6 +48,7 @@ CHECK_FOR_MPR() {
         echo "Settings -> Wine -> Installation Type should be \"Managed by XIVLauncher\""
         echo "This is generally the correct setting regardless of whether you wish to use ACT. You should not use system WINE to run ff14."
         echo "If you haven't run the game at least once, do so now and rerun setup.sh"
+        PROMPT_CONTINUE
         return 0
     else 
         warn "xivlauncher-git not found. please install it using makedeb or an MPR helper such as una."
@@ -69,6 +70,7 @@ ARCH_INSTALL_XLCORE() {
         cd xivlauncher-git
         warn "Making the package. this will install a number of make dependencies onto your system."
         warn "The full list of make dependencies can be found at https://aur.archlinux.org/packages/xivlauncher-git"
+        warn "You may be asked for your password. makepkg uses pacman to install dependencies, an operation that requires root."
         PROMPT_CONTINUE
         makepkg -s &>/dev/null
         PACKAGE_BALL=(*.pkg.tar.zst)

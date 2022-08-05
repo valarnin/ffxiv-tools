@@ -7,6 +7,8 @@
 
 SCRIPT_DIR="$(dirname "$0")"
 
+# FIXME: I lack the skills to update the VPN code to work with xlcore, so I am leaving things unchanged. -Arkevorkhat
+
 echo "This script will configure a VPN for use with FFXIV."
 echo
 
