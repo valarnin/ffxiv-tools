@@ -3,9 +3,17 @@
 . helpers/error.sh
 . helpers/prompt.sh
 . helpers/funcs.sh
+. helpers/ensure-aur-xlcore.sh
 
 # Determine where the user wants to install the tools
 . config/ffxiv-tools-location.sh
+
+echo "Checking installation..."
+CHECK_FOR_FLATPAK
+
+echo
+echo "Detected environment: $PLATFORM"
+echo
 
 echo "Setting up the FFXIV Environment scripts."
 echo
@@ -114,31 +122,27 @@ FFXIV_ENVIRON="$(cat /proc/$FFXIV_PID/environ | xargs -0 bash -c 'printf "export
 FFXIV_ENVIRON_FINAL="$(echo "$FFXIV_ENVIRON" | grep -P "$FFXIV_ENVIRON_REQ_RGX")"
 
 # Add FFXIV game path to environment for use in stage3 scripts
-# T ODO/F IXME: The path is usually (or always?) "/" (root) for some reason,
-# TODO: update this code to use the static ffxiv install location in xlcore
-# which needs investigation. However, these scripts don't use the stored
-# FFXIV_PATH value for anything so it's a low-priority bug.
-FFXIV_PATH="$(readlink -f /proc/$FFXIV_PID/cwd)"
+FFXIV_PATH=$(grep 'GamePath' $HOME/.xlcore/launcher.ini | sed 's/GamePath=\(.*\)/\1/')
 printf -v FFXIV_ENVIRON_FINAL '%s\nexport FFXIV_PATH=%q' "$FFXIV_ENVIRON_FINAL" "$FFXIV_PATH" 
 
-# Add XIVLauncher path to environment for use in stage3 scripts
-# Note that if we detect a specific version path, we automatically replace
-# the versioned subdirectory with the generic XIVLauncher executable (which
-# auto-runs/downloads the latest XIVLauncher version). We thereby avoid
-# having to reinstall our scripts every time the user upgrades XIVLauncher.
-# Raw Example:
-# C:\users\foo\AppData\Local\XIVLauncher\app-6.1.15\XIVLauncher.exe
-# Corrected Example:
-# C:\users\foo\AppData\Local\XIVLauncher\XIVLauncher.exe
-XIVLAUNCHER_PATH="$(grep -zPo '.*XIVLauncher.exe' /proc/$FFXIV_PID/cmdline | head -z -n 1 | sed -z 's/[/\\]app-[^/\\]*\([/\\]\)/\1/g' | tr -d '\0')"
+# XLCore uses a static installation location.
+XIVLAUNCHER_PATH="/opt/XIVLauncher/XIVLauncher.Core"
 printf -v FFXIV_ENVIRON_FINAL '%s\nexport XIVLAUNCHER_PATH=%q' "$FFXIV_ENVIRON_FINAL" "$XIVLAUNCHER_PATH" 
 
 
 
 # Generate Proton environment variables based on the Wine runner's location.
 # IMPORTANT: We MUST use the "eval" (and no quotes around the variable) to unescape the "printf %q" data from our raw env string.
-PROTON_PATH="$(echo "$FFXIV_ENVIRON_FINAL" | grep 'export WINE=' | cut -d'=' -f2-)"
-eval PROTON_PATH=$PROTON_PATH
+# TODO: update this to use xlcore wine
+MANAGED_WINE=$(grep 'WineStartupType' $HOME/.xlcore/launcher.ini | sed 's/WineStartupType=\(.*\)/\1/')
+echo $MANAGED_WINE
+if [[ $MANAGED_WINE == *"Managed"* ]]; then
+    echo "managed"
+    PROTON_PATH="$HOME/.xlcore/compatibilitytool/beta/wine-xiv-staging-fsync-git-7.10.r3.g560db77d/bin/wine"
+else
+    echo "not_managed"
+    PROTON_PATH=$(grep 'WineBinaryPath' $HOME/.xlcore/launcher.ini | sed 's/WineBinaryPath=\(.*\)/\1/')
+fi
 PROTON_DIST_PATH="$(dirname "$(dirname "$PROTON_PATH")")"
 
 # Extract the wineprefix value too.
@@ -155,12 +159,13 @@ printf -v FFXIV_ENVIRON_FINAL '%s\nexport PATH=%q:$PATH' "$FFXIV_ENVIRON_FINAL" 
 if [[ "$(getcap "$PROTON_PATH")" != "" ]]; then
     error "Detected that you're running this against an already configured Proton (the binary at path \"$PROTON_PATH\" has capabilities set already)."
     error "You must run this script against a fresh proton install, or else the LD_LIBRARY_PATH environment variable configured by your runtime cannot be detected."
-    exit 1
+    # exit 1
 fi
 
 echo
 success "Detected the following information about your setup. If any of this looks incorrect, please abort and report a bug to the Github repo..."
-echo "Runtime Environment: Lutris"
+echo "Runtime Environment: $PLATFORM XIVLauncher.Core"
+echo "FFXIV Game Location: $FFXIV_PATH"
 echo "wine Executable Location: $PROTON_PATH"
 echo "Proton Distribution Path: $PROTON_DIST_PATH"
 echo "Wine Prefix: $WINEPREFIX"
