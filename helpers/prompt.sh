@@ -57,7 +57,7 @@ PROMPT_BACKUP()
     fi
 
     while [[ "$CONTINUE" != "Y" && "$CONTINUE" != "N" && "$CONTINUE" != "y" && "$CONTINUE" != "n" ]]; do
-        read -p "Would you like to make a backup of your Proton install and FFXIV prefix? [Y/N] " CONTINUE
+        read -p "Would you like to make a backup of your wine install and FFXIV prefix? [Y/N] " CONTINUE
     done
 
     if [[ "$CONTINUE" == "N" || "$CONTINUE" == "n" ]]; then
@@ -66,7 +66,7 @@ PROMPT_BACKUP()
         TIMESTAMP="$(date +%s)"
 
         PROTON_BACKUP_FILENAME="BACKUP_dist_$TIMESTAMP.tar.gz"
-        echo "Creating Proton backup at $PROTON_BACKUP_DIR/$PROTON_BACKUP_FILENAME"
+        echo "Creating wine backup at $PROTON_BACKUP_DIR/$PROTON_BACKUP_FILENAME"
         tar -C "$PROTON_BACKUP_DIR" -czf "$PROTON_BACKUP_DIR/$PROTON_BACKUP_FILENAME" "$(basename "$PROTON_DIST_PATH")"
         echo "Backup created, size $(du -h "$PROTON_BACKUP_DIR/$PROTON_BACKUP_FILENAME" | cut -f1)"
 

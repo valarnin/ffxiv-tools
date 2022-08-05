@@ -24,7 +24,7 @@ fi
 ./setup-stage2.sh
 
 if [[ "$?" == "1" ]]; then
-    echo "Stage 2 setup (FFXIV Proton Modifications) failed. Aborting setup."
+    echo "Stage 2 setup (FFXIV wine Modifications) failed. Aborting setup."
     exit 1
 fi
 

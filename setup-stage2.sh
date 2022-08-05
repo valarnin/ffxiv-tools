@@ -7,8 +7,8 @@
 # Determine where the user wants to install the tools
 . config/ffxiv-tools-location.sh
 
-echo 'Setting up the Proton environment to run ACT with network capture'
-echo 'This script will set up your wine prefix and proton executables to run ACT, as well as set up a default ACT install for you'
+echo 'Setting up the wine environment to run ACT with network capture'
+echo 'This script will set up your wine prefix and wine executables to run ACT, as well as set up a default ACT install for you'
 echo 'If this process is aborted at any Continue prompt, it will resume from that point the next time it is run'
 echo 'Please make sure nothing is running in the wine prefix for FFXIV before continuing'
 
@@ -48,10 +48,10 @@ wine64 wineboot -fs &>/dev/null
 PROTON_VERSION_FULL=""
 
 echo
-warn 'Note that the next step is destructive, meaning that if something goes wrong it can break your wine prefix and/or your proton runner installation.'
+warn 'Note that the next step is destructive, meaning that if something goes wrong it can break your wine prefix and/or your wine runner installation.'
 echo 'Please make backups of both!'
 echo "Wine prefix: $WINEPREFIX"
-echo "Proton distribution: $PROTON_DIST_PATH"
+echo "wine distribution: $PROTON_DIST_PATH"
 
 PROMPT_BACKUP
 
