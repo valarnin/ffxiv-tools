@@ -61,7 +61,7 @@ $SCRIPT_HEADER
 
 . "$HOME/$FFXIV_TOOLS_LOCATION/ffxiv-env-setup.sh"
 cd "\$WINEPREFIX"
-"\$PROTON_DIST_PATH/bin/wine64" "\$(cat "\$WINEPREFIX/.ACT_Location")/Advanced Combat Tracker.exe"
+\$PROTON_DIST_PATH/bin/wine64 "\$(cat "\$WINEPREFIX/.ACT_Location")/Advanced Combat Tracker.exe"
 EOF
 )
 SCRIPT_START_BOTH=$(cat << EOF
@@ -71,7 +71,7 @@ $SCRIPT_HEADER
 cd "\$WINEPREFIX"
 "\$XIVLAUNCHER_PATH" &
 sleep 5
-"\$PROTON_DIST_PATH/bin/wine64" "\$(cat "\$WINEPREFIX/.ACT_Location")/Advanced Combat Tracker.exe"
+\$PROTON_DIST_PATH/bin/wine64 "\$(cat "\$WINEPREFIX/.ACT_Location")/Advanced Combat Tracker.exe"
 EOF
 )
 
