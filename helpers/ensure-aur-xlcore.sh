@@ -37,9 +37,9 @@ CHECK_FOR_AUR() {
         PROMPT_CONTINUE
     else
         warn "xivlauncher-git not found. please install it."
+        echo "Then launch the game, close it, and rerun setup.sh"
         echo "xivlauncher-git can be found at https://aur.archlinux.org/packages/xivlauncher-git"
-        PROMPT_CONTINUE
-        ARCH_INSTALL_XLCORE
+        exit 1
     fi
 }
 
