@@ -27,7 +27,7 @@ echo "Making sure that Wine isn't running anything..."
 # Close all Wine ".exe" processes.
 # NOTE: Since we scan for the newest PID each time, we'll properly close
 # the programs in the reverse order of how they were started!
-# T ODO/F IXME: This is harmful if there are other Wine runtimes on the system
+# TODO/FIXME: This is harmful if there are other Wine runtimes on the system
 # that are actively used, since it will forcibly close their programs.
 # This regex needs rewriting someday to only close .exe files belonging
 # to the exact FFXIV Wine runner we are targeting. Or perhaps just targeting
@@ -35,7 +35,6 @@ echo "Making sure that Wine isn't running anything..."
 # Or another alternative may be to find a way to signal our specific wine
 # runner (the FFXIV container's) to itself terminate all running programs?
 
-# TODO: update this to use wineserver -k
 while true; do
     GET_NEWEST_PID "WINE_EXE_PID" '[A-Z]:\\.*\.exe$'; PID_SUCCESS=$?
     [[ "$PID_SUCCESS" -ne 0 ]] && break
