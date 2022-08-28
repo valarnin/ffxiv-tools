@@ -3,6 +3,7 @@
 . helpers/error.sh
 . helpers/prompt.sh
 . helpers/funcs.sh
+. config/xlcore.sh
 
 # Determine where the user wants to install the tools
 . config/ffxiv-tools-location.sh
@@ -52,6 +53,7 @@ warn 'Note that the next step is destructive, meaning that if something goes wro
 echo 'Please make backups of both!'
 echo "Wine prefix: $WINEPREFIX"
 echo "wine distribution: $PROTON_DIST_PATH"
+echo "Wine version: $XLCORE_WINE_VERSION"
 
 PROMPT_BACKUP
 

@@ -149,13 +149,6 @@ printf -v FFXIV_ENVIRON_FINAL '%s\nexport PROTON_PATH=%q' "$FFXIV_ENVIRON_FINAL"
 printf -v FFXIV_ENVIRON_FINAL '%s\nexport PROTON_DIST_PATH=%q' "$FFXIV_ENVIRON_FINAL" "$PROTON_DIST_PATH" 
 printf -v FFXIV_ENVIRON_FINAL '%s\nexport PATH=%q:$PATH' "$FFXIV_ENVIRON_FINAL" "$PROTON_DIST_PATH/bin" 
 
-# Check for wine already being setcap'd, and fail if so.
-if [[ "$(getcap "$PROTON_PATH")" != "" ]]; then
-    error "Detected that you're running this against an already configured wine (the binary at path \"$PROTON_PATH\" has capabilities set already)."
-    error "You must run this script against a fresh wine install, or else the LD_LIBRARY_PATH environment variable configured by your runtime cannot be detected."
-    exit 1
-fi
-
 echo
 success "Detected the following information about your setup. If any of this looks incorrect, please abort and report a bug to the Github repo..."
 echo "Runtime Environment: $PLATFORM XIVLauncher.Core"

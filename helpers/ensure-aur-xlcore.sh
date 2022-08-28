@@ -24,8 +24,8 @@ CONTROL_FORK_DISTRO() {
     elif command -v apt &>/dev/null; then
         CHECK_FOR_MPR
     else
-        error "Your distribution isn't supported by these setup scripts. This script only supports"
-        echo "Arch-based and Debian-based distros, such as Arch Linux/Manjaro and Debian/Ubuntu/Linux Mint"
+        warn "Your distro isn't in the list of tested distros. Proceed at your own risk, and ensure that you've installed XIVLauncher Core from source."
+        PROMPT_CONTINUE;
     fi
 }
 
