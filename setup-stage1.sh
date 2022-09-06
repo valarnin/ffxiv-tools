@@ -112,6 +112,7 @@ declare -a FFXIV_ENVIRON_REQUIRED=(
     "WINEPRELOADRESERVE"
 )
 
+
 # Generate a safe, accurately-matching regex from the array above.
 # NOTE: We use `|` as separator.
 IFS=\| eval 'FFXIV_ENVIRON_REQ_RGX="^export (${FFXIV_ENVIRON_REQUIRED[*]})="'
@@ -132,8 +133,13 @@ printf -v FFXIV_ENVIRON_FINAL '%s\nexport XIVLAUNCHER_PATH=%q' "$FFXIV_ENVIRON_F
 
 MANAGED_WINE=$(grep 'WineStartupType' $HOME/.xlcore/launcher.ini | sed 's/WineStartupType=\(.*\)/\1/')
 if [[ $MANAGED_WINE == *"Managed"* ]]; then
+    # Find the actual wine version name inside the XLCore directory.
+    XLCORE_WINE_VERSION=$(ls -1tr $HOME/.xlcore/compatibilitytool/beta | tail -n1)
+    # This is hard-coded in XLCore, and is vanishingly unlikely to ever change.
     PROTON_PATH="$HOME/.xlcore/compatibilitytool/beta/$XLCORE_WINE_VERSION/bin/wine"
 else
+    # Customized wine doesn't actually require us to find the version, since the full path is stored in the ini file.
+    XLCORE_WINE_VERSION="Customized"
     PROTON_PATH=$(grep 'WineBinaryPath' $HOME/.xlcore/launcher.ini | sed 's/WineBinaryPath=\(.*\)/\1/')
 fi
 PROTON_DIST_PATH="$(dirname "$(dirname "$PROTON_PATH")")"
