@@ -3,25 +3,33 @@
 . helpers/error.sh
 . helpers/prompt.sh
 . helpers/funcs.sh
+. helpers/ensure-aur-xlcore.sh
 
+. config/xlcore.sh
 # Determine where the user wants to install the tools
 . config/ffxiv-tools-location.sh
 
+echo "Checking installation..."
+CHECK_FOR_FLATPAK
+
+echo
+echo "Detected environment: $PLATFORM"
+echo
+
 echo "Setting up the FFXIV Environment scripts."
 echo
-echo "This script will require you to open the FFXIV launcher from Lutris as if you were going to play the game normally"
+echo "This script will require you to launch the game from XIVLauncher Core."
 echo
 
 while true; do
-    GET_NEWEST_PID "FFXIV_PID" '[A-Z]:\\.*\\XIVLauncher.exe(?: --steamticket=[^\s]+)?$'; PID_SUCCESS=$?
+    GET_NEWEST_PID "FFXIV_PID" '[A-Z]:\\.*\\ffxiv_dx11.exe(?: --steamticket=[^\s]+)?'; PID_SUCCESS=$?
     [[ "$PID_SUCCESS" -eq 0 ]] && break
-    [[ -z "$XIVLAUNCHER_WARN" ]] && { warn "Please open the XIVLauncher Launcher. Checking for process \"XIVLauncher.exe\"..."; XIVLAUNCHER_WARN="Y"; }
+    [[ -z "$XIVLAUNCHER_WARN" ]] && { warn "Please open the game. looking for process \"ffxiv_dx11.exe\""; XIVLAUNCHER_WARN="Y"; }
     sleep 1
 done
 
 success "FFXIV Launcher PID found! ($FFXIV_PID)"
 echo "Building environment information based on FFXIV Launcher env..."
-
 # IMPORTANT: This array is extremely important and must be updated
 # whenever Lutris or its FFXIV wine runtime introduces new environment
 # variables, otherwise there will be plenty of bugs with the launched
@@ -104,6 +112,7 @@ declare -a FFXIV_ENVIRON_REQUIRED=(
     "WINEPRELOADRESERVE"
 )
 
+
 # Generate a safe, accurately-matching regex from the array above.
 # NOTE: We use `|` as separator.
 IFS=\| eval 'FFXIV_ENVIRON_REQ_RGX="^export (${FFXIV_ENVIRON_REQUIRED[*]})="'
@@ -115,32 +124,29 @@ FFXIV_ENVIRON="$(cat /proc/$FFXIV_PID/environ | xargs -0 bash -c 'printf "export
 FFXIV_ENVIRON_FINAL="$(echo "$FFXIV_ENVIRON" | grep -P "$FFXIV_ENVIRON_REQ_RGX")"
 
 # Add FFXIV game path to environment for use in stage3 scripts
-# TODO/FIXME: The path is usually (or always?) "/" (root) for some reason,
-# which needs investigation. However, these scripts don't use the stored
-# FFXIV_PATH value for anything so it's a low-priority bug.
-FFXIV_PATH="$(readlink -f /proc/$FFXIV_PID/cwd)"
+FFXIV_PATH=$(grep 'GamePath' $HOME/.xlcore/launcher.ini | sed 's/GamePath=\(.*\)/\1/')
 printf -v FFXIV_ENVIRON_FINAL '%s\nexport FFXIV_PATH=%q' "$FFXIV_ENVIRON_FINAL" "$FFXIV_PATH" 
 
-# Add XIVLauncher path to environment for use in stage3 scripts
-# Note that if we detect a specific version path, we automatically replace
-# the versioned subdirectory with the generic XIVLauncher executable (which
-# auto-runs/downloads the latest XIVLauncher version). We thereby avoid
-# having to reinstall our scripts every time the user upgrades XIVLauncher.
-# Raw Example:
-# C:\users\foo\AppData\Local\XIVLauncher\app-6.1.15\XIVLauncher.exe
-# Corrected Example:
-# C:\users\foo\AppData\Local\XIVLauncher\XIVLauncher.exe
-XIVLAUNCHER_PATH="$(grep -zPo '.*XIVLauncher.exe' /proc/$FFXIV_PID/cmdline | head -z -n 1 | sed -z 's/[/\\]app-[^/\\]*\([/\\]\)/\1/g' | tr -d '\0')"
+# XLCore uses a static installation location.
+XIVLAUNCHER_PATH="/opt/XIVLauncher/XIVLauncher.Core"
 printf -v FFXIV_ENVIRON_FINAL '%s\nexport XIVLAUNCHER_PATH=%q' "$FFXIV_ENVIRON_FINAL" "$XIVLAUNCHER_PATH" 
 
-# Generate Proton environment variables based on the Wine runner's location.
-# IMPORTANT: We MUST use the "eval" (and no quotes around the variable) to unescape the "printf %q" data from our raw env string.
-PROTON_PATH="$(echo "$FFXIV_ENVIRON_FINAL" | grep 'export WINE=' | cut -d'=' -f2-)"
-eval PROTON_PATH=$PROTON_PATH
+MANAGED_WINE=$(grep 'WineStartupType' $HOME/.xlcore/launcher.ini | sed 's/WineStartupType=\(.*\)/\1/')
+if [[ $MANAGED_WINE == *"Managed"* ]]; then
+    # Find the actual wine version name inside the XLCore directory.
+    XLCORE_WINE_VERSION=$(ls -1tr $HOME/.xlcore/compatibilitytool/beta | tail -n1)
+    # This is hard-coded in XLCore, and is vanishingly unlikely to ever change.
+    PROTON_PATH="$HOME/.xlcore/compatibilitytool/beta/$XLCORE_WINE_VERSION/bin/wine"
+else
+    # Customized wine doesn't actually require us to find the version, since the full path is stored in the ini file.
+    XLCORE_WINE_VERSION="Customized"
+    PROTON_PATH=$(grep 'WineBinaryPath' $HOME/.xlcore/launcher.ini | sed 's/WineBinaryPath=\(.*\)/\1/')
+fi
 PROTON_DIST_PATH="$(dirname "$(dirname "$PROTON_PATH")")"
 
 # Extract the wineprefix value too.
 # IMPORTANT: This is also fully escaped already, so we unescape it with "eval" too.
+# Works perfectly based on the lutris script, so has been left unchanged. -Arkevorkhat
 WINEPREFIX="$(echo "$FFXIV_ENVIRON_FINAL" | grep 'export WINEPREFIX=' | cut -d'=' -f2-)"
 eval WINEPREFIX=$WINEPREFIX
 
@@ -149,25 +155,12 @@ printf -v FFXIV_ENVIRON_FINAL '%s\nexport PROTON_PATH=%q' "$FFXIV_ENVIRON_FINAL"
 printf -v FFXIV_ENVIRON_FINAL '%s\nexport PROTON_DIST_PATH=%q' "$FFXIV_ENVIRON_FINAL" "$PROTON_DIST_PATH" 
 printf -v FFXIV_ENVIRON_FINAL '%s\nexport PATH=%q:$PATH' "$FFXIV_ENVIRON_FINAL" "$PROTON_DIST_PATH/bin" 
 
-# Check for wine already being setcap'd, and fail if so.
-if [[ "$(getcap "$PROTON_PATH")" != "" ]]; then
-    error "Detected that you're running this against an already configured Proton (the binary at path \"$PROTON_PATH\" has capabilities set already)."
-    error "You must run this script against a fresh proton install, or else the LD_LIBRARY_PATH environment variable configured by your runtime cannot be detected."
-    exit 1
-fi
-
-if [[ "$(echo "$FFXIV_ENVIRON_FINAL" | grep 'export LD_LIBRARY_PATH=')" == "" ]]; then
-    warn "Unable to determine runtime LD_LIBRARY_PATH."
-    warn "This may indicate something strange with your setup."
-    warn "Continuing is not advised unless you know how to fix any issues that may come up related to missing libraries."
-    exit 1
-fi
-
 echo
 success "Detected the following information about your setup. If any of this looks incorrect, please abort and report a bug to the Github repo..."
-echo "Runtime Environment: Lutris"
+echo "Runtime Environment: $PLATFORM XIVLauncher.Core"
+echo "FFXIV Game Location: $FFXIV_PATH"
 echo "wine Executable Location: $PROTON_PATH"
-echo "Proton Distribution Path: $PROTON_DIST_PATH"
+echo "wine Distribution Path: $PROTON_DIST_PATH"
 echo "Wine Prefix: $WINEPREFIX"
 echo "XIVLauncher Windows Path: $XIVLAUNCHER_PATH"
 echo
