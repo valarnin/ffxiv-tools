@@ -1,6 +1,11 @@
 # FFXIV Tools
 Tools for installing and configuring FFXIV and ACT on Linux.
 
+## If you're running XLCore
+You ***MUST*** use the AUR/compiled version of XLCore. The flatpak version will not work and can never work due to the nature of flatpak.
+
+Use the [xlcore](https://github.com/valarnin/ffxiv-tools/tree/xlcore) branch
+
 ## If you're running Lutris with XIVLauncher
 Use the [lutris-xivlauncher](https://github.com/valarnin/ffxiv-tools/tree/lutris-xivlauncher) branch
 
