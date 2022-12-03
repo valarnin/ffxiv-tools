@@ -5,7 +5,6 @@
 . helpers/funcs.sh
 . helpers/ensure-aur-xlcore.sh
 
-. config/xlcore.sh
 # Determine where the user wants to install the tools
 . config/ffxiv-tools-location.sh
 
