@@ -35,7 +35,7 @@ echo "Making sure that Wine isn't running anything..."
 # runner (the FFXIV container's) to itself terminate all running programs?
 
 while true; do
-    GET_NEWEST_PID "WINE_EXE_PID" '[A-Z]:\\.*\.exe$'; PID_SUCCESS=$?
+    GET_NEWEST_PID "WINE_EXE_PID" '[A-Z]:\\.*\.exe'; PID_SUCCESS=$?
     [[ "$PID_SUCCESS" -ne 0 ]] && break
     warn "Detected Wine process ($WINE_EXE_PID). Forcing it to exit..."
     kill -9 "$WINE_EXE_PID"
