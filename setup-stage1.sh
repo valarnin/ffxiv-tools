@@ -133,7 +133,7 @@ printf -v FFXIV_ENVIRON_FINAL '%s\nexport XIVLAUNCHER_PATH=%q' "$FFXIV_ENVIRON_F
 MANAGED_WINE=$(grep 'WineStartupType' $HOME/.xlcore/launcher.ini | sed 's/WineStartupType=\(.*\)/\1/')
 if [[ $MANAGED_WINE == *"Managed"* ]]; then
     # Find the actual wine version name inside the XLCore directory.
-    XLCORE_WINE_VERSION=$(ls -1tr $HOME/.xlcore/compatibilitytool/beta | tail -n1)
+    XLCORE_WINE_VERSION=$(ls -1trd $HOME/.xlcore/compatibilitytool/beta | tail -n1)
     # This is hard-coded in XLCore, and is vanishingly unlikely to ever change.
     PROTON_PATH="$HOME/.xlcore/compatibilitytool/beta/$XLCORE_WINE_VERSION/bin/wine"
 else
