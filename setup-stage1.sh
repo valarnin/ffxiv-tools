@@ -161,6 +161,7 @@ echo "FFXIV Game Location: $FFXIV_PATH"
 echo "wine Executable Location: $PROTON_PATH"
 echo "wine Distribution Path: $PROTON_DIST_PATH"
 echo "Wine Prefix: $WINEPREFIX"
+echo "Wine version: $XLCORE_WINE_VERSION"
 echo "XIVLauncher Windows Path: $XIVLAUNCHER_PATH"
 echo
 
