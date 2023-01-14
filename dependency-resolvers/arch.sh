@@ -31,7 +31,6 @@ ARCH_MISC() {
             echo "You must reboot after applying these settings."
             exit 1
             ;;
-        *)
         "wine_deps")
             echo "Please refer to the lutris documentation here:"
             echo "https://github.com/lutris/docs/blob/master/WineDependencies.md"
