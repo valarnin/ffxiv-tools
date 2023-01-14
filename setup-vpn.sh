@@ -14,7 +14,7 @@ echo
 
 echo "Checking prerequisites..."
 
-HAS_OPENVPN="$(which openvpn 2> /dev/null)"
+HAS_OPENVPN="$(command -v openvpn 2> /dev/null)"
 
 if [[ "$HAS_OPENVPN" == "" ]]; then
     warn "You do not have the OpenVPN client installed."
@@ -50,7 +50,7 @@ else
 fi
 
 HAS_SYSTEMD=""
-HAS_SYSTEMCTL="$(which systemctl)"
+HAS_SYSTEMCTL="$(command -v systemctl)"
 
 echo
 echo

@@ -22,7 +22,7 @@ CHECK_DEP_64() {
 
 CHECK_TOOL() {
     DEP="$1"
-    CHECK="$(which "$DEP" 2>/dev/null)"
+    CHECK="$(command -v "$DEP" 2>/dev/null)"
     if [[ "$CHECK" == "" ]]; then
         return 1;
     else

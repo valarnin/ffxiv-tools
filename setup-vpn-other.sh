@@ -158,7 +158,7 @@ EOF
 SCRIPT_RUN_ACT=$(cat << EOF
 $SCRIPT_RUN_COMMON_PRE
 
-RUN_COMMAND "\$(which bash)" "$HOME/$FFXIV_TOOLS_LOCATION/ffxiv-run-act.sh"
+RUN_COMMAND "\$(command -v bash)" "$HOME/$FFXIV_TOOLS_LOCATION/ffxiv-run-act.sh"
 
 $SCRIPT_RUN_COMMON_POST
 EOF
@@ -167,7 +167,7 @@ EOF
 SCRIPT_RUN_GAME=$(cat << EOF
 $SCRIPT_RUN_COMMON_PRE
 
-RUN_COMMAND "\$(which bash)" "$HOME/$FFXIV_TOOLS_LOCATION/ffxiv-run-game.sh"
+RUN_COMMAND "\$(command -v bash)" "$HOME/$FFXIV_TOOLS_LOCATION/ffxiv-run-game.sh"
 
 $SCRIPT_RUN_COMMON_POST
 EOF
@@ -176,7 +176,7 @@ EOF
 SCRIPT_RUN_BOTH=$(cat << EOF
 $SCRIPT_RUN_COMMON_PRE
 
-RUN_COMMAND "\$(which bash)" "$HOME/$FFXIV_TOOLS_LOCATION/ffxiv-run-both.sh"
+RUN_COMMAND "\$(command -v bash)" "$HOME/$FFXIV_TOOLS_LOCATION/ffxiv-run-both.sh"
 
 $SCRIPT_RUN_COMMON_POST
 EOF
