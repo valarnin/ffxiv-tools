@@ -118,7 +118,16 @@ declare -a FFXIV_ENVIRON_REQUIRED=(
 IFS=\| eval 'FFXIV_ENVIRON_REQ_RGX="^export (${FFXIV_ENVIRON_REQUIRED[*]})="'
 
 # Extract the currently running Lutris environment as properly quoted, newline-separated values.
-FFXIV_ENVIRON="$(cat /proc/$FFXIV_PID/environ | xargs -0 bash -c 'printf "export %q\n" "$@"' --)"
+get_ffxiv_pid_environ() {
+    if cat "/proc/$FFXIV_PID/environ" 2>/dev/null; then
+        return 0
+    fi
+    echo "Failed to cat /proc/$FFXIV_PID/environ. This can sometimes happen if your operating system only allows this action by root. We will try to rerun this command with sudo. You may be prompted for your password. The commands we will run with sudo are:" >&2
+    echo >&2
+    echo "  sudo cat /proc/$FFXIV_PID/environ" >&2
+    sudo cat /proc/$FFXIV_PID/environ
+}
+FFXIV_ENVIRON="$(get_ffxiv_pid_environ | xargs -0 bash -c 'printf "export %q\n" "$@"' --)"
 
 # Grab only the exact environment variables that we want.
 FFXIV_ENVIRON_FINAL="$(echo "$FFXIV_ENVIRON" | grep -P "$FFXIV_ENVIRON_REQ_RGX")"
