@@ -89,7 +89,7 @@ TARGET_USER="$USER"
 FFXIV_VPN_NAMESPACE="ffxiv"
 FFXIV_VPN_SUBNET="$IP_SUBNET"
 TARGET_INTERFACE="${NETWORK_INTERFACES[NETWORK_INTERFACES_ANSWER]}"
-OPENVPN="\$(which openvpn)"
+OPENVPN="\$(command -v openvpn)"
 
 EOF
 )
@@ -200,7 +200,7 @@ EOF
 SCRIPT_RUN_ACT=$(cat << EOF
 $SCRIPT_RUN_COMMON_PRE
 
-RUN_COMMAND "\$(which bash)" "$HOME/$FFXIV_TOOLS_LOCATION/ffxiv-run-act.sh"
+RUN_COMMAND "\$(command -v bash)" "$HOME/$FFXIV_TOOLS_LOCATION/ffxiv-run-act.sh"
 
 $SCRIPT_RUN_COMMON_POST
 EOF
@@ -209,7 +209,7 @@ EOF
 SCRIPT_RUN_GAME=$(cat << EOF
 $SCRIPT_RUN_COMMON_PRE
 
-RUN_COMMAND "\$(which bash)" "$HOME/$FFXIV_TOOLS_LOCATION/ffxiv-run-game.sh"
+RUN_COMMAND "\$(command -v bash)" "$HOME/$FFXIV_TOOLS_LOCATION/ffxiv-run-game.sh"
 
 $SCRIPT_RUN_COMMON_POST
 EOF
@@ -218,7 +218,7 @@ EOF
 SCRIPT_RUN_BOTH=$(cat << EOF
 $SCRIPT_RUN_COMMON_PRE
 
-RUN_COMMAND "\$(which bash)" "$HOME/$FFXIV_TOOLS_LOCATION/ffxiv-run-both.sh"
+RUN_COMMAND "\$(command -v bash)" "$HOME/$FFXIV_TOOLS_LOCATION/ffxiv-run-both.sh"
 
 $SCRIPT_RUN_COMMON_POST
 EOF
