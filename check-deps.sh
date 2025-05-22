@@ -5,10 +5,10 @@
 . helpers/deps.sh
 
 HARD_DEPS_32=(  )
-HARD_DEPS_64=( libFAudio.so.0 )
+HARD_DEPS_64=(  )
 
 SOFT_DEPS_32=(  )
-SOFT_DEPS_64=( libgcrypt.so )
+SOFT_DEPS_64=(  )
 
 HARD_TOOLS=( unzip wget )
 SOFT_TOOLS=(  )
