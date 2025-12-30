@@ -136,9 +136,16 @@ printf -v FFXIV_ENVIRON_FINAL '%s\nexport XIVLAUNCHER_PATH=%q' "$FFXIV_ENVIRON_F
 MANAGED_WINE=$(grep 'WineStartupType' $HOME/.xlcore/launcher.ini | sed 's/WineStartupType=\(.*\)/\1/')
 if [[ $MANAGED_WINE == *"Managed"* ]]; then
     # Find the actual wine version name inside the XLCore directory.
-    XLCORE_WINE_VERSION=$(ls -1tr $HOME/.xlcore/compatibilitytool/beta | tail -n1)
-    # This is hard-coded in XLCore, and is vanishingly unlikely to ever change.
-    PROTON_PATH="$HOME/.xlcore/compatibilitytool/beta/$XLCORE_WINE_VERSION/bin/wine"
+    # The base path is hard-coded in XLCore but may be different depending on version.
+    if [[ -d "$HOME/.xlcore/compatibilitytool/wine" ]]; then
+        # For versions of XLCore since https://github.com/goatcorp/XIVLauncher.Core/commit/877cfd14dd686dacc65aafd01ad38c5de4337ab6
+        XLCORE_WINE_BASE_DIR="$HOME/.xlcore/compatibilitytool/wine"
+    else
+        # For older XLCore versions
+        XLCORE_WINE_BASE_DIR="$HOME/.xlcore/compatibilitytool/beta"
+    fi
+    XLCORE_WINE_VERSION=$(ls -1tr $XLCORE_WINE_BASE_DIR | tail -n1)
+    PROTON_PATH="$XLCORE_WINE_BASE_DIR/$XLCORE_WINE_VERSION/bin/wine"
 else
     # Customized wine doesn't actually require us to find the version, since the full path is stored in the ini file.
     XLCORE_WINE_VERSION="Customized"
