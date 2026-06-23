@@ -144,7 +144,7 @@ if [[ $MANAGED_WINE == *"Managed"* ]]; then
         # For older XLCore versions
         XLCORE_WINE_BASE_DIR="$HOME/.xlcore/compatibilitytool/beta"
     fi
-    XLCORE_WINE_VERSION=$(ls -1tr $XLCORE_WINE_BASE_DIR | tail -n1)
+    XLCORE_WINE_VERSION=$(ls -1trd "$XLCORE_WINE_BASE_DIR"/*/ | awk -F/ '{print $(NF-1)}' | tail -n1)
     PROTON_PATH="$XLCORE_WINE_BASE_DIR/$XLCORE_WINE_VERSION/bin/wine"
 else
     # Customized wine doesn't actually require us to find the version, since the full path is stored in the ini file.
